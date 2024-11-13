@@ -1,0 +1,41 @@
+name: uHub
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Compose up
+        run: docker compose up -d
+
+      - name: NPM install
+        run: npm install
+
+      - name: Prettier format
+        run: npx prettier . --check
+
+#      - name: Db migrations
+#        run: bash migrate.sh
+
+      - name: Test
+        run: npm run test
+
+      - name: Compose down
+        run: docker compose down -v
