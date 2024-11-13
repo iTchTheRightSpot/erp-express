@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,12 +13,13 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "tsconfig-paths": "^4.2.0"
+    "express": "^4.21.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
-    "typescript": "^5.6.3"
+    "tsc-alias": "^1.8.10",
+    "typescript": "^5.6.3",
+    "tsconfig-paths": "^4.2.0"
   }
 }
