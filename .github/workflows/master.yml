@@ -31,8 +31,8 @@ jobs:
       - name: Prettier format
         run: npx prettier . --check
 
-#      - name: Db migrations
-#        run: bash migrate.sh
+      - name: Db migrations
+        run: bash migrate.sh
 
       - name: Test
         run: npm run test

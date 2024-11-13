@@ -34,7 +34,7 @@ Run the following command in the root of your terminal `docker compose up -d`.
 
 ## Docs
 
-1. [Schema design](https://dbdiagram.io/d/landscape-diagram-66303ee65b24a634d01e83ea).
+1. [Schema design](https://dbdiagram.io/d/landscape-erp-66303ee65b24a634d01e83ea).
 2. [PG getting started](https://node-postgres.com/).
 3. [PG connection pool](https://node-postgres.com/apis/pool)
 4. [PG connecting](https://node-postgres.com/features/connecting)

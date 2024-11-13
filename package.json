@@ -8,7 +8,7 @@
     "test": "jest",
     "lint": "npx prettier . --write",
     "migrate": "node-pg-migrate",
-    "create": "npm run migrate create $npm_config_name"
+    "new": "npm run migrate create $npm_config_name"
   },
   "keywords": [],
   "author": "iTchTheRightSpot",
