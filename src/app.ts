@@ -71,10 +71,9 @@ const init = () => {
     process.exit(1);
   }
 
-  const log =
-    env.NODE_ENV === 'production'
-      ? new LoggerImpl(env.LOGGER)
-      : new DevelopmentLogger();
+  const log = env.COOKIESECURE
+    ? new LoggerImpl(env.LOGGER)
+    : new DevelopmentLogger();
   const db = new DatabaseClient(pool);
   const tx = new TransactionProvider(log, pool);
   const services = initializeServices(log, initializeAdapters(log, db, tx));
