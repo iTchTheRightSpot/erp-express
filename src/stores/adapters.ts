@@ -5,6 +5,8 @@ import { IProfileStore } from '@stores/user_profile/user-profile.interface.store
 import { UserProfileStore } from '@stores/user_profile/user-profile.store';
 import { IStaffStore } from '@stores/staff/staff.interface.store';
 import { StaffStore } from '@stores/staff/staff.store';
+import { RoleStore } from '@stores/role/role.store';
+import { IRoleStore } from '@stores/role/role.interface.store';
 
 /**
  * Holds all classes that directly communicate with the database.
@@ -12,6 +14,7 @@ import { StaffStore } from '@stores/staff/staff.store';
  */
 export interface Adapters {
   profileStore: IProfileStore;
+  roleStore: IRoleStore;
   staffStore: IStaffStore;
   txProvider?: ITransactionProvider;
 }
@@ -30,6 +33,7 @@ export const initializeAdapters = (
 ) => {
   const store: Adapters = {
     profileStore: new UserProfileStore(logger, client),
+    roleStore: new RoleStore(logger, client),
     staffStore: new StaffStore(logger, client),
     txProvider: tx
   };

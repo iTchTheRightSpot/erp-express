@@ -7,8 +7,21 @@
 
 ## Get Started
 
-Create RSA public and private key in keys folder. In terminal run
-`cd keys && ssh-keygen -t rsa -b 4096 -m PEM -f <filename>.key -N ""`.
+Assuming on UNIX OS, in your terminal run
+`ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwt.key -N ""
+touch .env
+echo NODE_ENV=development >> .env
+echo COOKIENAME=ERPCOOKIE >> .env
+echo COOKIE_SAMESITE=lax >> .env
+echo FRONTEND_URL="*" >> .env
+echo PORT=4000 >> .env
+echo DB_HOST=localhost >> .env
+echo DB_USERNAME=mrp >> .env
+echo DB_PASSWORD=mrp >> .env
+echo DB_DATABASE=mrp_db >> .env
+echo DB_PORT=5432 >> .env
+echo "PUB_KEY_PATH=\"./keys/jwt.key.pub\"" >> .env
+echo "PRIV_KEY_PATH=\"./keys/jwt.key\"" >> .env`.
 
 ### Local PostgresSQL Setup
 
