@@ -1,15 +1,18 @@
 import { ITransactionProvider } from '@stores/transaction';
 import { ILogger } from '@utils/log';
 import { IDatabaseClient } from '@stores/db-client';
-import { IUserProfileStore } from '@stores/user_profile/user-profile.interface.store';
+import { IProfileStore } from '@stores/user_profile/user-profile.interface.store';
 import { UserProfileStore } from '@stores/user_profile/user-profile.store';
+import { IStaffStore } from '@stores/staff/staff.interface.store';
+import { StaffStore } from '@stores/staff/staff.store';
 
 /**
  * Holds all classes that directly communicate with the database.
  * Provides access to specific data stores and optional transaction management.
  */
 export interface Adapters {
-  profileStore: IUserProfileStore;
+  profileStore: IProfileStore;
+  staffStore: IStaffStore;
   txProvider?: ITransactionProvider;
 }
 
@@ -27,6 +30,7 @@ export const initializeAdapters = (
 ) => {
   const store: Adapters = {
     profileStore: new UserProfileStore(logger, client),
+    staffStore: new StaffStore(logger, client),
     txProvider: tx
   };
   return store;

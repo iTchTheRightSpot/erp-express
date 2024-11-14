@@ -1,9 +1,9 @@
-import { IUserProfileStore } from '@stores/user_profile/user-profile.interface.store';
+import { IProfileStore } from '@stores/user_profile/user-profile.interface.store';
 import { ILogger } from '@utils/log';
 import { UserProfile } from '@models/user_profile/user-profile.model';
 import { IDatabaseClient } from '@stores/db-client';
 
-export class UserProfileStore implements IUserProfileStore {
+export class UserProfileStore implements IProfileStore {
   constructor(
     private readonly logger: ILogger,
     private readonly db: IDatabaseClient
@@ -11,13 +11,13 @@ export class UserProfileStore implements IUserProfileStore {
 
   save(o: UserProfile): Promise<UserProfile> {
     return new Promise<UserProfile>(async (resolve, reject) => {
-      try {
-        const query = `
-                    INSERT INTO user_profile (firstname, lastname, email, image_key)
-                    VALUES ($1, $2, $3, $4)
-                    RETURNING profile_id, firstname, lastname, email, image_key
-                `;
+      const query = `
+        INSERT INTO user_profile (firstname, lastname, email, image_key)
+        VALUES ($1, $2, $3, $4)
+        RETURNING profile_id, firstname, lastname, email, image_key
+    `;
 
+      try {
         const res = await this.db.execContext(
           query.trim(),
           o.firstname,

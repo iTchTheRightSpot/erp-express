@@ -18,7 +18,12 @@ exports.up = (pgm) => {
         notNull: true,
         unique: true
       },
-      staff_uuid: { type: 'varchar(37)', notNull: true, unique: true },
+      staff_uuid: {
+        type: 'UUID',
+        notNull: true,
+        unique: true,
+        default: pgm.func('gen_random_uuid()')
+      },
       bio: { type: 'varchar(255)', notNull: false, unique: false },
       profile_id: { type: 'BIGINT', notNull: false }
     },
