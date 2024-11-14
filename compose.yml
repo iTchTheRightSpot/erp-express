@@ -3,16 +3,18 @@ services:
     image: postgres:15.6
     restart: always
     container_name: pg
+    env_file:
+      - ./.env
     volumes:
       - pd-db-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: mrp_db
-      POSTGRES_USER: mrp
-      POSTGRES_PASSWORD: mrp
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - '5432:5432'
+      - ${DB_PORT}:${DB_PORT}
     expose:
-      - 5432
+      - ${DB_PORT}
     healthcheck:
       test: ['CMD', 'pg_isready']
       interval: 10s

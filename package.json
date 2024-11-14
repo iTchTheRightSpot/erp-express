@@ -4,11 +4,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "start": "nodemon -r tsconfig-paths/register src/index.ts",
+    "start": "nodemon -r tsconfig-paths/register src/server.ts",
     "test": "jest",
     "lint": "npx prettier . --write",
     "migrate": "node-pg-migrate",
-    "create": "npm run migrate create $npm_config_name"
+    "new": "npm run migrate create $npm_config_name"
   },
   "keywords": [],
   "author": "iTchTheRightSpot",
