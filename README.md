@@ -8,7 +8,7 @@
 ## Get Started
 
 Create RSA public and private key in keys folder. In terminal run
-`cd keys && ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key`.
+`cd keys && ssh-keygen -t rsa -b 4096 -m PEM -f <filename>.key -N ""`.
 
 ### Local PostgresSQL Setup
 
