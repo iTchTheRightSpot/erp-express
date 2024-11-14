@@ -1,15 +1,18 @@
 import express, { Application, Router } from 'express';
 import { env } from '@utils/env';
 import { DevelopmentLogger, ILogger, LoggerImpl } from '@utils/log';
-import { initializeServices, IServices } from '@services/services.interface';
+import { initializeServices, IServices } from '@services/services';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import { expressjwt } from 'express-jwt';
-import { initializeHandlers } from '@handlers/handlers.inteface';
+import { initializeHandlers } from '@handlers/handlers';
 import { Pool } from 'pg';
 import { middlewareChain } from '@middlewares/chain.middleware';
+import { initializeAdapters } from '@stores/adapters';
+import { DatabaseClient } from '@stores/db-client';
+import { TransactionProvider } from '@stores/transaction';
 
 export const createApp = (logger: ILogger, services: IServices) => {
   const app: Application = express();
@@ -72,7 +75,10 @@ const init = () => {
     env.NODE_ENV === 'production'
       ? new LoggerImpl(env.LOGGER)
       : new DevelopmentLogger();
-  return createApp(log, initializeServices());
+  const db = new DatabaseClient(pool);
+  const tx = new TransactionProvider(log, pool);
+  const services = initializeServices(log, initializeAdapters(log, db, tx));
+  return createApp(log, services);
 };
 
 export default init;

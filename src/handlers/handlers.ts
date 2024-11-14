@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { ILogger } from '@utils/log';
-import { IServices } from '@services/services.interface';
+import { IServices } from '@services/services';
 
 interface IHandlers {}
 
