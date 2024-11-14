@@ -22,8 +22,8 @@ export const env = {
   FRONTEND_URL: process.env.FRONTEND_URL || '*',
   PORT: parseInt(process.env.PORT || '4000', 10),
   NODE_ENV: process.env.NODE_ENV || 'development',
-  JWT_PUB_KEY: fs.readFileSync(publicKeyPath),
-  JWT_PRIV_KEY: fs.readFileSync(privateKeyPath),
+  JWT_PUB_KEY: fs.readFileSync(publicKeyPath, 'utf8'),
+  JWT_PRIV_KEY: fs.readFileSync(privateKeyPath, 'utf8'),
   // https://github.com/winstonjs/winston
   LOGGER: winston.createLogger({
     level: 'http',

@@ -3,41 +3,7 @@
 ## Requirements:
 
 1. NodeJs 20.
-2. Docker or PostgresSQL installed.
-
-## Get Started
-
-Assuming on UNIX OS, in your terminal run
-`ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwt.key -N ""
-touch .env
-echo NODE_ENV=development >> .env
-echo COOKIENAME=ERPCOOKIE >> .env
-echo COOKIE_SAMESITE=lax >> .env
-echo FRONTEND_URL="*" >> .env
-echo PORT=4000 >> .env
-echo DB_HOST=localhost >> .env
-echo DB_USERNAME=mrp >> .env
-echo DB_PASSWORD=mrp >> .env
-echo DB_DATABASE=mrp_db >> .env
-echo DB_PORT=5432 >> .env
-echo "PUB_KEY_PATH=\"./keys/jwt.key.pub\"" >> .env
-echo "PRIV_KEY_PATH=\"./keys/jwt.key\"" >> .env`.
-
-### Local PostgresSQL Setup
-
-Create a database named `mrp_db` where the username & password are `mrp`.
-
-### Docker Setup
-
-Run the following command in the root of your terminal `docker compose up -d`.
-
-### Running the Application
-
-1. Install dependencies `npm i`.
-2. Assuming running using UNIX OS, in you terminal in the root of application,
-   run `bash migrate.sh` to run all migrations against the db.
-3. Start the application `npm start`.
-4. Verify the application is running by accessing the default endpoint: `curl http://localhost:4000/api/v1/`.
+2. PostgresSQL.
 
 ### Test
 

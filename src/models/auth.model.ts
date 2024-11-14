@@ -5,15 +5,15 @@ export interface JwtObject {
 }
 
 export interface StaffJwt extends JwtObject {
-  staff_id: string;
+  staff_uuid: string;
 }
 
 export interface UserJwt extends JwtObject {
-  user_id: string;
+  user_uuid: string;
 }
 
-export interface JwtClaimsObject {
-  obj: JwtObject;
+export interface JwtClaimsObject<T extends JwtObject> {
+  obj: T;
   iss: string;
   iat: number;
   exp: number;

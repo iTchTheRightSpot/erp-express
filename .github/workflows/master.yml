@@ -24,7 +24,8 @@ jobs:
 
       - name: Env
         run: |
-          ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwt.key -N ""
+          openssl genrsa -out keys/private.key 2048
+          openssl rsa -in keys/private.key -pubout -out keys/public.key
           touch .env
           echo NODE_ENV=development >> .env
           echo COOKIENAME=ERPCOOKIE >> .env
