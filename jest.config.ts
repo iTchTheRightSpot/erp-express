@@ -93,6 +93,8 @@ const config: Config = {
   // moduleNameMapper: {},
   moduleNameMapper: {
     '^@mrp/(.*)$': '<rootDir>/src/$1',
+    '^@keys/(.*)$': '<rootDir>/keys/$1',
+    '^@mock/(.*)$': '<rootDir>/test/mock/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',
     '^@handlers/(.*)$': '<rootDir>/src/handlers/$1',
     '^@services/(.*)$': '<rootDir>/src/services/$1',

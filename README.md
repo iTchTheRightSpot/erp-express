@@ -3,28 +3,7 @@
 ## Requirements:
 
 1. NodeJs 20.
-2. Docker or PostgresSQL installed.
-
-## Get Started
-
-Create RSA public and private key in keys folder. In terminal run
-`cd keys && ssh-keygen -t rsa -b 4096 -m PEM -f <filename>.key -N ""`.
-
-### Local PostgresSQL Setup
-
-Create a database named `mrp_db` where the username & password are `mrp`.
-
-### Docker Setup
-
-Run the following command in the root of your terminal `docker compose up -d`.
-
-### Running the Application
-
-1. Install dependencies `npm i`.
-2. Assuming running using UNIX OS, in you terminal in the root of application,
-   run `bash migrate.sh` to run all migrations against the db.
-3. Start the application `npm start`.
-4. Verify the application is running by accessing the default endpoint: `curl http://localhost:4000/api/v1/`.
+2. PostgresSQL.
 
 ### Test
 

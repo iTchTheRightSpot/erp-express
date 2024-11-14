@@ -9,34 +9,32 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
+  pgm.createType('roleenum', ['USER', 'DEVELOPER', 'STAFF']);
+
   pgm.createTable(
-    'staff',
+    'role',
     {
-      staff_id: {
+      role_id: {
         primaryKey: true,
         type: 'BIGSERIAL',
         notNull: true,
         unique: true
       },
-      staff_uuid: {
-        type: 'UUID',
+      role: {
+        type: 'roleenum',
         notNull: true,
-        unique: true,
-        default: pgm.func('gen_random_uuid()')
+        default: 'USER'
       },
-      bio: { type: 'varchar(255)', notNull: false, unique: false },
-      profile_id: { type: 'BIGINT', notNull: false }
+      profile_id: { type: 'BIGINT', notNull: true }
     },
-    {
-      ifNotExists: true
-    }
+    { ifNotExists: true }
   );
 
-  pgm.addConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.addConstraint('role', 'FK_role_to_user_profile_profile_id', {
     foreignKeys: {
       columns: 'profile_id',
       references: 'user_profile(profile_id)',
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'RESTRICT'
     }
   });
@@ -48,9 +46,10 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.dropType('roleenum', { ifExists: true, cascade: true });
+  pgm.dropConstraint('role', 'FK_role_to_user_profile_profile_id', {
     ifExists: true,
     cascade: true
   });
-  pgm.dropTable('staff', { ifExists: true, cascade: true });
+  pgm.dropTable('role', { ifExists: true, cascade: true });
 };

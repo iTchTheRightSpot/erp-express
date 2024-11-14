@@ -24,7 +24,8 @@ jobs:
 
       - name: Env
         run: |
-          ssh-keygen -t rsa -b 4096 -m PEM -f keys/jwt.key -N ""
+          openssl genrsa -out keys/private.key 2048
+          openssl rsa -in keys/private.key -pubout -out keys/public.key
           touch .env
           echo NODE_ENV=development >> .env
           echo COOKIENAME=ERPCOOKIE >> .env
@@ -36,8 +37,8 @@ jobs:
           echo DB_PASSWORD=mrp >> .env
           echo DB_DATABASE=mrp_db >> .env
           echo DB_PORT=5432 >> .env
-          echo "PUB_KEY_PATH=\"./keys/jwt.key.pub\"" >> .env
-          echo "PRIV_KEY_PATH=\"./keys/jwt.key\"" >> .env
+          echo "PUB_KEY_PATH=\"./keys/public.key\"" >> .env
+          echo "PRIV_KEY_PATH=\"./keys/private.key\"" >> .env
 
       - name: Compose up
         run: docker compose up -d
