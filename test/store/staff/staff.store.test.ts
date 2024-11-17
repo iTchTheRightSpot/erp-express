@@ -52,9 +52,18 @@ describe('staff store', () => {
       }
     });
 
-    it('should save staff', async () => {
+    it('should save staff & find by uuid', async () => {
       // method to test
-      await store.save({ profile_id: profile.profile_id } as Staff);
+      const staff = await store.save({ profile_id: profile.profile_id } as Staff);
+
+      // assert
+      expect(staff.staff_id).toBeGreaterThan(0)
+
+      // method to test
+      const find = await store.staffByUUID(staff.uuid)
+
+      // assert
+      expect(staff).toEqual(find)
     });
   });
 });

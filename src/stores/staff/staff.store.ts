@@ -43,4 +43,27 @@ export class StaffStore implements IStaffStore {
       }
     });
   }
+
+  staffByUUID(uuid: string): Promise<Staff | undefined> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const q = 'SELECT * FROM staff WHERE uuid = $1'
+        const res = await this.db.execContext(q, uuid.trim())
+
+        if (!res.rows[0]) {
+          this.logger.error(`no staff with uuid ${uuid.trim()} found`);
+          return resolve(undefined);
+        }
+
+        const row = res.rows[0] as Staff
+        row.staff_id = Number(row.staff_id)
+        row.profile_id = row.profile_id !== null ? Number(row.profile_id) : null
+
+        resolve(row);
+      } catch (e) {
+        this.logger.error(`exception finding staff with uuid ${JSON.stringify(e)}`)
+        reject(e)
+      }
+    })
+  }
 }
