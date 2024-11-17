@@ -92,7 +92,7 @@ const config: Config = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
   moduleNameMapper: {
-    '^@mrp/(.*)$': '<rootDir>/src/$1',
+    '^@erp/(.*)$': '<rootDir>/src/$1',
     '^@keys/(.*)$': '<rootDir>/keys/$1',
     '^@mock/(.*)$': '<rootDir>/test/mock/$1',
     '^@utils/(.*)$': '<rootDir>/src/utils/$1',

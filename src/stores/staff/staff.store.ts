@@ -17,15 +17,15 @@ export class StaffStore implements IStaffStore {
 
     return new Promise<Staff>(async (resolve, reject) => {
       const query = `
-            INSERT INTO staff (staff_uuid, bio, profile_id)
+            INSERT INTO staff (uuid, bio, profile_id)
             VALUES ($1, $2, $3)
-            RETURNING staff_id, staff_uuid, bio, profile_id
+            RETURNING staff_id, uuid, bio, profile_id
         `.trim();
 
       try {
         const res = await this.db.execContext(
           query,
-          s.staff_uuid || uuid(),
+          s.uuid || uuid(),
           s.bio || null,
           s.profile_id
         );

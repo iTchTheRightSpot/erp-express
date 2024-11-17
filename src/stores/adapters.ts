@@ -1,12 +1,13 @@
-import { ITransactionProvider } from '@stores/transaction';
+import { ITransactionProvider } from './transaction';
 import { ILogger } from '@utils/log';
-import { IDatabaseClient } from '@stores/db-client';
-import { IProfileStore } from '@stores/user_profile/user-profile.interface.store';
-import { UserProfileStore } from '@stores/user_profile/user-profile.store';
-import { IStaffStore } from '@stores/staff/staff.interface.store';
-import { StaffStore } from '@stores/staff/staff.store';
-import { RoleStore } from '@stores/role/role.store';
-import { IRoleStore } from '@stores/role/role.interface.store';
+import { IDatabaseClient } from './db-client';
+import { IProfileStore } from './profile/profile.interface.store';
+import { ProfileStore } from './profile/profile.store';
+import { IStaffStore } from './staff/staff.interface.store';
+import { StaffStore } from './staff/staff.store';
+import { RoleStore } from './role/role.store';
+import { IPermissionStore, IRoleStore } from './role/role.interface.store';
+import { PermissionStore } from './role/permission.store';
 
 /**
  * Holds all classes that directly communicate with the database.
@@ -15,6 +16,7 @@ import { IRoleStore } from '@stores/role/role.interface.store';
 export interface Adapters {
   profileStore: IProfileStore;
   roleStore: IRoleStore;
+  permissionStore: IPermissionStore;
   staffStore: IStaffStore;
   txProvider?: ITransactionProvider;
 }
@@ -32,8 +34,9 @@ export const initializeAdapters = (
   tx?: ITransactionProvider
 ) => {
   const store: Adapters = {
-    profileStore: new UserProfileStore(logger, client),
+    profileStore: new ProfileStore(logger, client),
     roleStore: new RoleStore(logger, client),
+    permissionStore: new PermissionStore(logger, client),
     staffStore: new StaffStore(logger, client),
     txProvider: tx
   };

@@ -1,10 +1,10 @@
 import { Pool, PoolClient } from 'pg';
 import { poolInstance } from '@mock/pool';
-import { IProfileStore } from '@stores/user_profile/user-profile.interface.store';
+import { IProfileStore } from '@stores/profile/profile.interface.store';
 import { DevelopmentLogger } from '@utils/log';
-import { UserProfileStore } from '@stores/user_profile/user-profile.store';
+import { ProfileStore } from '@stores/profile/profile.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
-import { UserProfile } from '@models/user_profile/user-profile.model';
+import { Profile } from '@models/profile/profile.model';
 
 describe('user_profile store', () => {
   let pool: Pool;
@@ -14,7 +14,7 @@ describe('user_profile store', () => {
   beforeAll(async () => {
     pool = poolInstance();
     client = await pool.connect();
-    store = new UserProfileStore(
+    store = new ProfileStore(
       new DevelopmentLogger(),
       new MockLiveDatabaseClient(client)
     );
@@ -33,8 +33,8 @@ describe('user_profile store', () => {
     const u = {
       firstname: 'firstname',
       lastname: 'lastname',
-      email: 'mrp@email.com'
-    } as UserProfile;
+      email: 'erp@email.com'
+    } as Profile;
 
     // method to test
     const save = await store.save(u);

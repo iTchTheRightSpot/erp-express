@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { createApp } from '@mrp/app';
+import { createApp } from '@erp/app';
 import { Application } from 'express';
 import { env } from '@utils/env';
 import { IServices } from '@services/services';

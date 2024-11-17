@@ -1,25 +1,18 @@
-import { RoleEnum } from './role.model';
+import { RolePermission } from './role.model';
 
 export interface JwtObject {
-  roles: RoleEnum[];
+  user_id: string;
+  access_controls: RolePermission[];
 }
 
-export interface StaffJwt extends JwtObject {
-  staff_uuid: string;
-}
-
-export interface UserJwt extends JwtObject {
-  user_uuid: string;
-}
-
-export interface JwtClaimsObject<T extends JwtObject> {
-  obj: T;
+export interface JwtClaimsObject {
+  obj: JwtObject;
   iss: string;
   iat: number;
   exp: number;
 }
 
 export interface JwtResponse {
-  jwt: string;
+  token: string;
   exp: Date;
 }

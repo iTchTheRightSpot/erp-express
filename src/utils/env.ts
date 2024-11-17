@@ -41,10 +41,10 @@ export const env = {
     ]
   }),
   DB_CONFIG: {
-    user: process.env.DB_USERNAME || 'uhub',
-    password: process.env.DB_PASSWORD || 'uhub',
+    user: process.env.DB_USERNAME || 'erp',
+    password: process.env.DB_PASSWORD || 'erp',
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
-    database: process.env.DB_DATABASE || 'uhub_db'
+    database: process.env.DB_DATABASE || 'erp_db'
   }
 };

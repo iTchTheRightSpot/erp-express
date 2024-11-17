@@ -19,5 +19,5 @@ export const cookieResponse = (
     sameSite: env.COOKIE_SAMESITE as 'lax' | 'strict' | 'none'
   };
 
-  res.status(status).cookie(env.COOKIENAME, obj.jwt, options);
+  res.status(status).cookie(env.COOKIENAME, obj.token, options);
 };

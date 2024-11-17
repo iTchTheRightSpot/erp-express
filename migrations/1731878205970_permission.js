@@ -9,34 +9,31 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
+  pgm.createType('permissionenum', ['READ', 'WRITE', 'DELETE']);
+
   pgm.createTable(
-    'staff',
+    'permission',
     {
-      staff_id: {
+      permission_id: {
         primaryKey: true,
         type: 'BIGSERIAL',
         notNull: true,
         unique: true
       },
-      uuid: {
-        type: 'UUID',
-        notNull: true,
-        unique: true,
-        default: pgm.func('gen_random_uuid()')
+      permission: {
+        type: 'permissionenum',
+        notNull: true
       },
-      bio: { type: 'varchar(255)', notNull: false, unique: false },
-      profile_id: { type: 'BIGINT', notNull: false }
+      role_id: { type: 'BIGINT', notNull: true }
     },
-    {
-      ifNotExists: true
-    }
+    { ifNotExists: true }
   );
 
-  pgm.addConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.addConstraint('permission', 'FK_permission_to_role_role_id', {
     foreignKeys: {
-      columns: 'profile_id',
-      references: 'user_profile(profile_id)',
-      onDelete: 'SET NULL',
+      columns: 'permission_id',
+      references: 'role(role_id)',
+      onDelete: 'CASCADE',
       onUpdate: 'RESTRICT'
     }
   });
@@ -48,9 +45,10 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.dropType('permissionenum', { ifExists: true, cascade: true });
+  pgm.dropConstraint('permission', 'FK_permission_to_role_role_id', {
     ifExists: true,
     cascade: true
   });
-  pgm.dropTable('staff', { ifExists: true, cascade: true });
+  pgm.dropTable('permission', { ifExists: true, cascade: true });
 };

@@ -4,16 +4,16 @@ import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { StaffStore } from '@stores/staff/staff.store';
-import { UserProfile } from '@models/user_profile/user-profile.model';
-import { IProfileStore } from '@stores/user_profile/user-profile.interface.store';
-import { UserProfileStore } from '@stores/user_profile/user-profile.store';
+import { Profile } from '@models/profile/profile.model';
+import { IProfileStore } from '@stores/profile/profile.interface.store';
+import { ProfileStore } from '@stores/profile/profile.store';
 import { Staff } from '@models/staff/staff.model';
 import { InsertionException } from '@exceptions/insertion.exception';
 
 describe('staff store', () => {
   let pool: Pool;
   let client: PoolClient;
-  let profile: UserProfile;
+  let profile: Profile;
   let profileStore: IProfileStore;
   let store: IStaffStore;
 
@@ -22,7 +22,7 @@ describe('staff store', () => {
     client = await pool.connect();
     const logger = new DevelopmentLogger();
     const db = new MockLiveDatabaseClient(client);
-    profileStore = new UserProfileStore(logger, db);
+    profileStore = new ProfileStore(logger, db);
     store = new StaffStore(logger, db);
   });
 
@@ -32,8 +32,8 @@ describe('staff store', () => {
     profile = await profileStore.save({
       firstname: 'firstname',
       lastname: 'lastname',
-      email: 'mrp@email.com'
-    } as UserProfile);
+      email: 'erp@email.com'
+    } as Profile);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));

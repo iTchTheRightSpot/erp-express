@@ -15,5 +15,5 @@ export const initializeHandlers = (
 };
 
 async function welcome(req: Request, res: Response): Promise<void> {
-  res.status(200).send({ message: 'welcome to Landscape MRP api' });
+  res.status(200).send({ message: 'welcome to Landscape ERP api' });
 }

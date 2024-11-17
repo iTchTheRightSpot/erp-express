@@ -32,7 +32,7 @@
     "paths": {
       "@mock/*": ["./test/mock/*"],
       "@keys/*": ["./keys/*"],
-      "@mrp/*": ["./src/*"],
+      "@erp/*": ["./src/*"],
       "@utils/*": ["./src/utils/*"],
       "@handlers/*": ["./src/handlers/*"],
       "@services/*": ["./src/services/*"],
