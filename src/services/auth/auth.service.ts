@@ -28,9 +28,7 @@ export class JwtService implements IJwtService {
     return { token: token, exp: expireAt };
   }
 
-  async validateJwt(
-    token: string
-  ): Promise<JwtClaimsObject> {
+  async validateJwt(token: string): Promise<JwtClaimsObject> {
     try {
       const obj = await jwt.verify(token, env.JWT_PUB_KEY);
       return obj as JwtClaimsObject;

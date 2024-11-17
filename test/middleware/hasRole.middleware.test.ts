@@ -1,9 +1,5 @@
 import { DevelopmentLogger } from '@utils/log';
-import {
-  PermissionEnum,
-  RoleEnum,
-  RolePermission
-} from '@models/role.model';
+import { PermissionEnum, RoleEnum, RolePermission } from '@models/role.model';
 import express from 'express';
 import { JwtObject } from '@models/auth.model';
 import { middleware } from '@middlewares/chain.middleware';

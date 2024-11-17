@@ -106,7 +106,7 @@ const refreshToken = (
 
     if (req.path.endsWith('/logout')) {
       next();
-      return
+      return;
     }
 
     try {
