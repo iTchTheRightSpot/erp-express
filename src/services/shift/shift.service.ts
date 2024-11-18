@@ -88,7 +88,7 @@ export class ShiftService implements IShiftService {
     try {
       // save
       const savePromises = dto.times.map((time) =>
-        this.adapters.txProvider!.runInTransaction(async (adapters) => {
+        this.adapters.txProvider?.runInTransaction(async (adapters) => {
           await adapters.shiftStore.save({
             staff_id: staff.staff_id,
             shift_start: time.start,
