@@ -10,18 +10,19 @@ exports.shorthands = undefined;
  */
 exports.up = (pgm) => {
   pgm.createTable(
-    'user_profile',
+    'service',
     {
-      profile_id: {
+      service_id: {
         primaryKey: true,
         type: 'BIGSERIAL',
         notNull: true,
         unique: true
       },
-      firstname: { type: 'varchar(100)', notNull: true, unique: false },
-      lastname: { type: 'varchar(100)', notNull: true, unique: false },
-      email: { type: 'varchar(255)', notNull: true, unique: true },
-      image_key: { type: 'varchar(255)', notNull: false, unique: false }
+      name: { type: 'varchar(50)', notNull: true, unique: true },
+      price: { type: 'decimal(50)', notNull: true },
+      is_visible: { type: 'bool', notNull: true, default: false },
+      duration: { type: 'integer', notNull: true },
+      clean_up_time: { type: 'integer', notNull: true }
     },
     {
       ifNotExists: true
@@ -35,5 +36,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('user_profile', { ifExists: true });
+  pgm.dropTable('service', { ifExists: true });
 };

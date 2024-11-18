@@ -20,8 +20,8 @@ exports.up = (pgm) => {
       },
       shift_start: { type: 'timestamp', notNull: true },
       shift_end: { type: 'timestamp', notNull: true },
-      is_visible: { type: 'boolean', notNull: true, default: false },
-      is_reoccurring: { type: 'boolean', notNull: true, default: false },
+      is_visible: { type: 'bool', notNull: true, default: false },
+      is_reoccurring: { type: 'bool', notNull: true, default: false },
       staff_id: { type: 'BIGINT', notNull: true }
     },
     {
@@ -74,5 +74,5 @@ exports.down = (pgm) => {
     ifExists: true
   });
 
-  pgm.dropTable('shift', { ifExists: true, cascade: true });
+  pgm.dropTable('shift', { ifExists: true });
 };

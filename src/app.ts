@@ -1,7 +1,7 @@
 import express, { Application, Router } from 'express';
 import { env } from '@utils/env';
 import { DevelopmentLogger, ILogger, LoggerImpl } from '@utils/log';
-import { initializeServices, IServices } from '@services/services';
+import { initializeServices, ServicesRegistry } from '@services/services';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as path from 'path';
@@ -14,7 +14,7 @@ import { initializeAdapters } from '@stores/adapters';
 import { DatabaseClient } from '@stores/db-client';
 import { TransactionProvider } from '@stores/transaction';
 
-export const createApp = (logger: ILogger, services: IServices) => {
+export const createApp = (logger: ILogger, services: ServicesRegistry) => {
   const app: Application = express();
 
   app.use(middleware.log(logger));

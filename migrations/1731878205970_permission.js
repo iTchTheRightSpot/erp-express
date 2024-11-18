@@ -45,9 +45,9 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropType('permissionenum', { ifExists: true, cascade: true });
   pgm.dropConstraint('permission', 'FK_permission_to_role_role_id', {
     ifExists: true
   });
-  pgm.dropTable('permission', { ifExists: true, cascade: true });
+  pgm.dropTable('permission', { ifExists: true });
+  pgm.dropType('permissionenum', { ifExists: true });
 };

@@ -31,7 +31,7 @@ export class StaffStore implements IStaffStore {
         row.profile_id = Number(row.profile_id);
 
         resolve(row);
-        this.logger.log('new staff save');
+        this.logger.log('new staff saved');
       } catch (e) {
         this.logger.error(
           `exception inserting to staff table: ${JSON.stringify(e)}`
