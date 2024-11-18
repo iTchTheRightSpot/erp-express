@@ -1,8 +1,11 @@
 import { Request, Response, Router } from 'express';
 import { ILogger } from '@utils/log';
 import { IServices } from '@services/services';
+import { ShiftHandler } from './shift/shift.handler';
 
-interface IHandlers {}
+interface IHandlers {
+  shiftHandler: ShiftHandler;
+}
 
 export const initializeHandlers = (
   router: Router,
@@ -10,7 +13,9 @@ export const initializeHandlers = (
   services: IServices
 ) => {
   router.get('/', welcome);
-  const handlers: IHandlers = {};
+  const handlers: IHandlers = {
+    shiftHandler: new ShiftHandler(router, logger, services.shiftService)
+  };
   return handlers;
 };
 

@@ -15,7 +15,7 @@ export class LoggerImpl implements ILogger {
 
   constructor(
     private readonly logger: Logger,
-    private readonly zone: string
+    zone: string
   ) {
     if (!moment.tz.names().includes(zone)) {
       throw new ServerException(`invalid timezone: ${zone}`);
@@ -62,7 +62,7 @@ export class LoggerImpl implements ILogger {
 export class DevelopmentLogger implements ILogger {
   private readonly momentTimeZone: moment.Moment;
 
-  constructor(private readonly zone?: string) {
+  constructor(zone?: string) {
     const z = zone || 'America/Toronto';
     if (!moment.tz.names().includes(z)) {
       throw new ServerException(`invalid timezone: ${z}`);

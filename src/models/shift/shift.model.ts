@@ -48,8 +48,8 @@ export class ShiftPayload {
   @IsDefined({ message: 'staff_id has to be defined' })
   @IsNotEmpty({ message: 'staff_id cannot be empty' })
   @IsString({ message: 'staff_id has to be a string' })
-  @MinLength(37, { message: 'staff_id must be at most 34 characters' })
-  @MaxLength(37, { message: 'staff_id must be at most 34 characters' })
+  @MinLength(36, { message: 'staff_id must be at min 36 characters' })
+  @MaxLength(37, { message: 'staff_id must be at most 37 characters' })
   staff_id: string;
 
   @IsDefined({ message: 'times has to be defined' })
