@@ -1,0 +1,105 @@
+import {
+  IsDefined,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength
+} from 'class-validator';
+import { BadRequestException } from '@exceptions/bad-request.exception';
+import moment from 'moment-timezone';
+
+export interface IShift {
+  shift_id: number;
+  staff_id: number;
+  shift_start: Date;
+  shift_end: Date;
+  is_visible: boolean;
+  is_reoccurring: boolean;
+}
+
+export interface ISchedulePeriod {
+  isVisible: boolean;
+  isReoccurring: boolean;
+  start: Date;
+  end: Date;
+}
+
+export interface IShiftPayload {
+  staffId: string;
+  times: ISchedulePeriod[];
+}
+
+export class ShiftSegmentPayload {
+  @IsDefined({ message: 'is_visible has to be defined' })
+  is_visible: boolean;
+
+  @IsDefined({ message: 'is_reoccurring has to be defined' })
+  is_reoccurring: boolean;
+
+  @IsDefined({ message: 'start has to be defined' })
+  @IsString({ message: 'start has to be a string' })
+  start: string; // in ISO 8601 standard
+
+  @IsDefined({ message: 'duration in seconds has to be defined' })
+  duration: number; // in seconds
+}
+
+export class ShiftPayload {
+  @IsDefined({ message: 'staff_id has to be defined' })
+  @IsNotEmpty({ message: 'staff_id cannot be empty' })
+  @IsString({ message: 'staff_id has to be a string' })
+  @MinLength(36, { message: 'staff_id must be at min 36 characters' })
+  @MaxLength(37, { message: 'staff_id must be at most 37 characters' })
+  staff_id: string;
+
+  @IsDefined({ message: 'times has to be defined' })
+  @IsNotEmpty({ message: 'times cannot be empty' })
+  times: ShiftSegmentPayload[];
+}
+
+export const checkForOverLappingSegments = (
+  dto: ShiftPayload,
+  now: Date,
+  timezone: string
+) => {
+  const result: IShiftPayload = {
+    staffId: dto.staff_id.trim(),
+    times: [] as ISchedulePeriod[]
+  };
+
+  for (let i = 0; i < dto.times.length; i++) {
+    let parse: moment.Moment;
+
+    try {
+      parse = moment.tz(dto.times[i].start, timezone);
+      if (!parse.isValid()) throw new BadRequestException();
+    } catch (e) {
+      throw new BadRequestException(
+        `invalid date ${JSON.stringify(dto.times[i].start)}`
+      );
+    }
+
+    if (parse.toDate() < now)
+      throw new BadRequestException(
+        `${JSON.stringify(dto.times[i].start)} cannot be in the past`
+      );
+
+    const start = parse.toDate();
+    const end = new Date(start);
+    end.setSeconds(end.getSeconds() + dto.times[i].duration);
+
+    if (result.times.some((obj) => start <= obj.end && end >= obj.start))
+      throw new BadRequestException(
+        `${JSON.stringify(dto.times[i].start)} and duration ${JSON.stringify(dto.times[i].duration)} overlap with an existing time period`
+      );
+
+    result.times[i] = {
+      isVisible: dto.times[i].is_visible,
+      isReoccurring: dto.times[i].is_reoccurring,
+      start: start,
+      end: end
+    };
+  }
+
+  return result;
+};

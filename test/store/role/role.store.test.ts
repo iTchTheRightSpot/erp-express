@@ -2,18 +2,18 @@ import { Pool, PoolClient } from 'pg';
 import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
 import { IRoleStore } from '@stores/role/role.interface.store';
-import { UserProfile } from '@models/user_profile/user-profile.model';
+import { IProfile } from '@models/profile/profile.model';
 import { RoleStore } from '@stores/role/role.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
-import { UserProfileStore } from '@stores/user_profile/user-profile.store';
-import { Role, RoleEnum } from '@models/role.model';
+import { ProfileStore } from '@stores/profile/profile.store';
+import { IRole, RoleEnum } from '@models/role.model';
 
 describe('user_role store', () => {
   let pool: Pool;
   let client: PoolClient;
   const logger = new DevelopmentLogger();
   let store: IRoleStore;
-  let profile: UserProfile;
+  let profile: IProfile;
 
   beforeAll(async () => {
     pool = poolInstance();
@@ -23,16 +23,16 @@ describe('user_role store', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    const userStore = new UserProfileStore(
+    const userStore = new ProfileStore(
       logger,
       new MockLiveDatabaseClient(client)
     );
     profile = await userStore.save({
       firstname: 'firstname',
       lastname: 'lastname',
-      email: 'uhub@email.com',
+      email: 'erp@email.com',
       image_key: 'image-key'
-    } as UserProfile);
+    } as IProfile);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));
@@ -46,7 +46,7 @@ describe('user_role store', () => {
     const role = {
       role: RoleEnum.USER,
       profile_id: profile.profile_id
-    } as Role;
+    } as IRole;
 
     // method to test
     const save = await store.save(role);
@@ -61,7 +61,7 @@ describe('user_role store', () => {
     const role = {
       role: RoleEnum.DEVELOPER,
       profile_id: profile.profile_id
-    } as Role;
+    } as IRole;
 
     // method to test
     const save = await store.save(role);
@@ -76,7 +76,7 @@ describe('user_role store', () => {
     const role = {
       role: RoleEnum.STAFF,
       profile_id: profile.profile_id
-    } as Role;
+    } as IRole;
 
     // method to test
     const save = await store.save(role);

@@ -1,7 +1,7 @@
 import express, { Application, Router } from 'express';
 import { env } from '@utils/env';
 import { DevelopmentLogger, ILogger, LoggerImpl } from '@utils/log';
-import { initializeServices, IServices } from '@services/services';
+import { initializeServices, ServicesRegistry } from '@services/services';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as path from 'path';
@@ -9,28 +9,19 @@ import cookieParser from 'cookie-parser';
 import { expressjwt } from 'express-jwt';
 import { initializeHandlers } from '@handlers/handlers';
 import { Pool } from 'pg';
-import { middlewareChain } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/chain.middleware';
 import { initializeAdapters } from '@stores/adapters';
 import { DatabaseClient } from '@stores/db-client';
 import { TransactionProvider } from '@stores/transaction';
 
-export const createApp = (logger: ILogger, services: IServices) => {
+export const createApp = (logger: ILogger, services: ServicesRegistry) => {
   const app: Application = express();
 
-  app.use(middlewareChain.log(logger));
+  app.use(middleware.log(logger));
   app.use(express.json());
   app.use(bodyParser.json());
   app.use(express.urlencoded({ extended: false }));
-  app.use(express.static(path.join(__dirname, 'public')));
-  app.use(
-    cors({
-      origin: [env.FRONTEND_URL, '*'],
-      credentials: true
-    })
-  );
-  app.set('trust proxy', 1);
   app.use(cookieParser());
-
   app.use(
     expressjwt({
       secret: env.JWT_PUB_KEY,
@@ -41,6 +32,15 @@ export const createApp = (logger: ILogger, services: IServices) => {
       path: [env.ROUTE_PREFIX, new RegExp(`${env.ROUTE_PREFIX}authentication/`)]
     })
   );
+  app.use(middleware.refreshToken(logger, services.jwtService));
+  app.use(express.static(path.join(__dirname, 'public')));
+  app.use(
+    cors({
+      origin: [env.FRONTEND_URL, '*'],
+      credentials: true
+    })
+  );
+  app.set('trust proxy', 1);
 
   // routes
   const router = Router();
@@ -48,7 +48,7 @@ export const createApp = (logger: ILogger, services: IServices) => {
 
   app.use(env.ROUTE_PREFIX, router);
 
-  app.use(middlewareChain.error(logger));
+  app.use(middleware.error(logger));
 
   return app;
 };
@@ -72,8 +72,8 @@ const init = () => {
   }
 
   const log = env.COOKIESECURE
-    ? new LoggerImpl(env.LOGGER)
-    : new DevelopmentLogger();
+    ? new LoggerImpl(env.LOGGER, 'America/Toronto')
+    : new DevelopmentLogger('America/Toronto');
   const db = new DatabaseClient(pool);
   const tx = new TransactionProvider(log, pool);
   const services = initializeServices(log, initializeAdapters(log, db, tx));

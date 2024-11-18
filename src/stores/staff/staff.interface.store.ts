@@ -1,5 +1,6 @@
-import { Staff } from '@models/staff/staff.model';
+import { IStaff } from '@models/staff/staff.model';
 
 export interface IStaffStore {
-  save(s: Staff): Promise<Staff>;
+  save(s: IStaff): Promise<IStaff>;
+  staffByUUID(uuid: string): Promise<IStaff | undefined>;
 }

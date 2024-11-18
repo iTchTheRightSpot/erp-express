@@ -1,6 +1,6 @@
-export interface Staff {
+export interface IStaff {
   staff_id: number;
-  staff_uuid: string;
+  uuid: string;
   bio: string | null;
   profile_id: number | null;
 }

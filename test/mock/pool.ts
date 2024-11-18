@@ -20,7 +20,6 @@ export const poolInstance = () => {
       console.error(`failed to initialize db connection ${e}`);
       process.exit(1);
     }
-    return pool;
   }
   return pool;
 };

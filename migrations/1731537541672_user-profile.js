@@ -35,5 +35,5 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropTable('user_profile', { ifExists: true, cascade: true });
+  pgm.dropTable('user_profile', { ifExists: true });
 };
