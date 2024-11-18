@@ -6,7 +6,7 @@ import {
   Router
 } from 'express';
 import { ILogger } from '@utils/log';
-import { IServiceOffered } from '@services/service/service.interface.service';
+import { IService } from '@services/service/service.interface';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import { middleware } from '@middlewares/chain.middleware';
 import { ServicePayload } from '@models/service/service.model';
@@ -15,7 +15,7 @@ export class ServiceHandler {
   constructor(
     private readonly router: Router,
     private readonly logger: ILogger,
-    private readonly service: IServiceOffered
+    private readonly service: IService
   ) {
     this.register();
   }

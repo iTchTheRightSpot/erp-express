@@ -1,33 +1,46 @@
 import { Pool, PoolClient } from 'pg';
 import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
-import { IRoleStore } from '@stores/role/role.interface.store';
+import {
+  IPermissionStore,
+  IRoleStore
+} from '@stores/role/role.interface.store';
 import { IProfile } from '@models/profile/profile.model';
 import { RoleStore } from '@stores/role/role.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { ProfileStore } from '@stores/profile/profile.store';
-import { IRole, RoleEnum } from '@models/role.model';
+import {
+  IPermission,
+  IRole,
+  PermissionEnum,
+  RoleEnum
+} from '@models/role.model';
+import { PermissionStore } from '@stores/role/permission.store';
+import { IDatabaseClient } from '@stores/db-client';
+import { IProfileStore } from '@stores/profile/profile.interface.store';
 
 describe('user_role store', () => {
   let pool: Pool;
   let client: PoolClient;
   const logger = new DevelopmentLogger();
-  let store: IRoleStore;
+  let profileStore: IProfileStore;
+  let roleStore: IRoleStore;
+  let dbClient: IDatabaseClient;
+  let permissionStore: IPermissionStore;
   let profile: IProfile;
 
   beforeAll(async () => {
     pool = poolInstance();
     client = await pool.connect();
-    store = new RoleStore(logger, new MockLiveDatabaseClient(client));
+    dbClient = new MockLiveDatabaseClient(client);
+    profileStore = new ProfileStore(logger, dbClient);
+    roleStore = new RoleStore(logger, dbClient);
+    permissionStore = new PermissionStore(logger, dbClient);
   });
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    const userStore = new ProfileStore(
-      logger,
-      new MockLiveDatabaseClient(client)
-    );
-    profile = await userStore.save({
+    profile = await profileStore.save({
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'erp@email.com',
@@ -49,7 +62,7 @@ describe('user_role store', () => {
     } as IRole;
 
     // method to test
-    const save = await store.save(role);
+    const save = await roleStore.save(role);
 
     // assert
     expect(save.role_id).toBeGreaterThan(0);
@@ -64,7 +77,7 @@ describe('user_role store', () => {
     } as IRole;
 
     // method to test
-    const save = await store.save(role);
+    const save = await roleStore.save(role);
 
     // assert
     expect(save.role_id).toBeGreaterThan(0);
@@ -79,11 +92,28 @@ describe('user_role store', () => {
     } as IRole;
 
     // method to test
-    const save = await store.save(role);
+    const save = await roleStore.save(role);
 
     // assert
     expect(save.role_id).toBeGreaterThan(0);
     expect(save.role).toEqual(RoleEnum.STAFF);
     expect(save.profile_id).toBeGreaterThan(0);
+  });
+
+  it('should save permission', async () => {
+    // given
+    const role = await roleStore.save({
+      role: RoleEnum.USER,
+      profile_id: profile.profile_id
+    } as IRole);
+
+    // method to test
+    const save = await permissionStore.save({
+      permission: PermissionEnum.WRITE,
+      role_id: role.role_id
+    } as IPermission);
+
+    // assert
+    expect(save.permission_id).toBeGreaterThan(0);
   });
 });

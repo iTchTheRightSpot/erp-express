@@ -1,6 +1,6 @@
 import { IsDefined, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export interface IService {
+export interface ServiceEntity {
   service_id: number;
   name: string;
   price: string;
