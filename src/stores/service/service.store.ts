@@ -39,4 +39,31 @@ export class ServiceStore implements IServiceStore {
       }
     });
   }
+
+  serviceByName(name: string): Promise<ServiceEntity | undefined> {
+    return new Promise<ServiceEntity | undefined>(async (resolve, reject) => {
+      try {
+        const res = await this.db.execContext(
+          'SELECT * FROM service WHERE name = $1',
+          name.trim()
+        );
+
+        if (!res.rows[0]) {
+          resolve(undefined);
+          this.logger.log(`no service found with name ${name}`);
+          return;
+        }
+
+        const row = res.rows[0] as ServiceEntity;
+        row.service_id = Number(row.service_id);
+        row.duration = Number(row.duration);
+        row.clean_up_time = Number(row.clean_up_time);
+
+        resolve(row);
+      } catch (e) {
+        this.logger.error(`exception finding service with name ${name} ${e}`);
+        reject(e);
+      }
+    });
+  }
 }

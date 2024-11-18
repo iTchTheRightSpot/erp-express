@@ -28,7 +28,8 @@ describe('service store', () => {
     await pool.end();
   });
 
-  it('should save service entity', async () => {
+  it('should save service entity and find by name', async () => {
+    // method to test
     const save = await store.save({
       name: 'service',
       price: '180.17',
@@ -38,5 +39,13 @@ describe('service store', () => {
 
     // assert
     expect(save.service_id).toBeGreaterThan(0);
+
+    // method to test
+    const find = await store.serviceByName('service');
+    const notFound = await store.serviceByName('services');
+
+    // assert
+    expect(save).toEqual(find);
+    expect(notFound).toBeUndefined();
   });
 });

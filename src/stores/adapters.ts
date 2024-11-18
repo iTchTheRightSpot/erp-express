@@ -3,7 +3,7 @@ import { ILogger } from '@utils/log';
 import { IDatabaseClient } from './db-client';
 import { IProfileStore } from './profile/profile.interface.store';
 import { ProfileStore } from './profile/profile.store';
-import { IStaffStore } from './staff/staff.interface.store';
+import { IStaffServiceStore, IStaffStore } from './staff/staff.interface.store';
 import { StaffStore } from './staff/staff.store';
 import { RoleStore } from './role/role.store';
 import { IPermissionStore, IRoleStore } from './role/role.interface.store';
@@ -12,6 +12,7 @@ import { IShiftStore } from './shift/shift.interface.store';
 import { ShiftStore } from './shift/shift.store';
 import { ServiceStore } from './service/service.store';
 import { IServiceStore } from './service/service.interface.store';
+import { StaffServiceStore } from './staff/staff-service.store';
 
 /**
  * Holds all classes that directly communicate with the database.
@@ -24,6 +25,7 @@ export interface Adapters {
   staffStore: IStaffStore;
   shiftStore: IShiftStore;
   serviceStore: IServiceStore;
+  staffServiceStore: IStaffServiceStore;
   txProvider?: ITransactionProvider;
 }
 
@@ -46,6 +48,7 @@ export const initializeAdapters = (
     staffStore: new StaffStore(logger, client),
     shiftStore: new ShiftStore(logger, client),
     serviceStore: new ServiceStore(logger, client),
+    staffServiceStore: new StaffServiceStore(logger, client),
     txProvider: tx
   };
   return store;
