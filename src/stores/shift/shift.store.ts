@@ -39,4 +39,34 @@ export class ShiftStore implements IShiftStore {
       }
     });
   }
+
+  countExistingShiftsForStaff(
+    staffId: number,
+    start: Date,
+    end: Date
+  ): Promise<number> {
+    const q = `
+        SELECT COUNT(s.shift_id) FROM shift s
+        WHERE s.staff_id = $1
+        AND (
+          (s.shift_start BETWEEN $2 AND $3) OR
+          (s.shift_end BETWEEN $2 AND $3)
+        )
+      `;
+
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const res = await this.db.execContext(q, staffId, start, end);
+        const row = res.rows[0];
+        if (!row) {
+          reject(-1);
+          return;
+        }
+        resolve(Number(row.count));
+      } catch (e) {
+        this.logger.error(e);
+        reject(e);
+      }
+    });
+  }
 }

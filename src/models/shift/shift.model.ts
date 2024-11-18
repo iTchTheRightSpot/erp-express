@@ -63,7 +63,7 @@ export const checkForOverLappingSegments = (
   timezone: string
 ) => {
   const result: IShiftPayload = {
-    staffId: dto.staff_id,
+    staffId: dto.staff_id.trim(),
     times: [] as ISchedulePeriod[]
   };
 

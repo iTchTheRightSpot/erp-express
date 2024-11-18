@@ -15,7 +15,6 @@
   "license": "ISC",
   "description": "erp application for managing landscaping",
   "dependencies": {
-    "argon2": "^0.41.1",
     "body-parser": "^1.20.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
