@@ -49,8 +49,7 @@ exports.up = (pgm) => {
  */
 exports.down = (pgm) => {
   pgm.dropConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
-    ifExists: true,
-    cascade: true
+    ifExists: true
   });
   pgm.dropTable('staff', { ifExists: true, cascade: true });
 };

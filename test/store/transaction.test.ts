@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { DatabaseClient, DatabaseTransactionClient } from '@stores/db-client';
 import { TransactionProvider } from '@stores/transaction';
 import { Adapters, initializeAdapters } from '@stores/adapters';
-import { Profile } from '@models/profile/profile.model';
+import { IProfile } from '@models/profile/profile.model';
 import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
 
@@ -27,7 +27,7 @@ describe('transaction provider', () => {
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as Profile);
+        } as IProfile);
 
         expect(frog.profile_id).toBeGreaterThan(0);
         expect(await adaps.profileStore.delete(frog.profile_id)).toEqual(1);
@@ -40,7 +40,7 @@ describe('transaction provider', () => {
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as Profile);
+        } as IProfile);
 
         expect(frog.profile_id).toBeGreaterThan(0);
         profileId = frog.profile_id;
@@ -56,7 +56,7 @@ describe('transaction provider', () => {
           firstname: 'dog',
           lastname: 'dog lastname',
           email: 'dog@email.com'
-        } as Profile);
+        } as IProfile);
 
         expect(dog.profile_id).toBeGreaterThan(0);
 
@@ -76,13 +76,13 @@ describe('transaction provider', () => {
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as Profile);
+        } as IProfile);
         await expect(
           adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as Profile)
+          } as IProfile)
         ).rejects.toThrow(
           'duplicate key value violates unique constraint "user_profile_email_key"'
         );

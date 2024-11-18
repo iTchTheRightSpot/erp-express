@@ -1,6 +1,9 @@
 import { LogEntry, Logger } from 'winston';
+import moment from 'moment-timezone';
+import { ServerException } from '@exceptions/server.exception';
 
 export interface ILogger {
+  timezone(): moment.Moment;
   date(): Date;
   log(...args: any[]): void;
   error(...args: any[]): void;
@@ -8,7 +11,17 @@ export interface ILogger {
 }
 
 export class LoggerImpl implements ILogger {
-  constructor(private readonly logger: Logger) {}
+  private readonly momentTimeZone: moment.Moment;
+
+  constructor(
+    private readonly logger: Logger,
+    private readonly zone: string
+  ) {
+    if (!moment.tz.names().includes(zone)) {
+      throw new ServerException(`invalid timezone: ${zone}`);
+    }
+    this.momentTimeZone = moment().tz(zone);
+  }
 
   error(...args: any[]): void {
     const entry: LogEntry = {
@@ -29,10 +42,7 @@ export class LoggerImpl implements ILogger {
   }
 
   date(): Date {
-    const date = new Date().toLocaleString('en-US', {
-      timeZone: 'America/Toronto'
-    });
-    return new Date(date);
+    return this.momentTimeZone.toDate();
   }
 
   async critical(...args: any[]): Promise<void> {
@@ -43,14 +53,25 @@ export class LoggerImpl implements ILogger {
     };
     this.logger.error(entry);
   }
+
+  timezone(): moment.Moment {
+    return this.momentTimeZone;
+  }
 }
 
 export class DevelopmentLogger implements ILogger {
+  private readonly momentTimeZone: moment.Moment;
+
+  constructor(private readonly zone?: string) {
+    const z = zone || 'America/Toronto';
+    if (!moment.tz.names().includes(z)) {
+      throw new ServerException(`invalid timezone: ${z}`);
+    }
+    this.momentTimeZone = moment().tz(z);
+  }
+
   date(): Date {
-    const date = new Date().toLocaleString('en-US', {
-      timeZone: 'America/Toronto'
-    });
-    return new Date(date);
+    return this.momentTimeZone.toDate();
   }
 
   error(...args: any[]): void {
@@ -78,5 +99,9 @@ export class DevelopmentLogger implements ILogger {
       timestamp: new Date().toISOString()
     };
     console.error(entry);
+  }
+
+  timezone(): moment.Moment {
+    return this.momentTimeZone;
   }
 }

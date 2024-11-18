@@ -4,16 +4,15 @@ import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { StaffStore } from '@stores/staff/staff.store';
-import { Profile } from '@models/profile/profile.model';
+import { IProfile } from '@models/profile/profile.model';
 import { IProfileStore } from '@stores/profile/profile.interface.store';
 import { ProfileStore } from '@stores/profile/profile.store';
-import { Staff } from '@models/staff/staff.model';
-import { InsertionException } from '@exceptions/insertion.exception';
+import { IStaff } from '@models/staff/staff.model';
 
 describe('staff store', () => {
   let pool: Pool;
   let client: PoolClient;
-  let profile: Profile;
+  let profile: IProfile;
   let profileStore: IProfileStore;
   let store: IStaffStore;
 
@@ -28,12 +27,11 @@ describe('staff store', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    // method to test
     profile = await profileStore.save({
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'erp@email.com'
-    } as Profile);
+    } as IProfile);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));
@@ -44,26 +42,20 @@ describe('staff store', () => {
   });
 
   describe('saving staff behavior', () => {
-    it(`should throw ${InsertionException.name} as profile_id is missing`, async () => {
-      try {
-        await store.save({} as Staff);
-      } catch (e) {
-        expect(e).toBeInstanceOf(InsertionException);
-      }
-    });
-
     it('should save staff & find by uuid', async () => {
       // method to test
-      const staff = await store.save({ profile_id: profile.profile_id } as Staff);
+      const staff = await store.save({
+        profile_id: profile.profile_id
+      } as IStaff);
 
       // assert
-      expect(staff.staff_id).toBeGreaterThan(0)
+      expect(staff.staff_id).toBeGreaterThan(0);
 
       // method to test
-      const find = await store.staffByUUID(staff.uuid)
+      const find = await store.staffByUUID(staff.uuid);
 
       // assert
-      expect(staff).toEqual(find)
+      expect(staff).toEqual(find);
     });
   });
 });

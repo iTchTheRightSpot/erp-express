@@ -7,7 +7,7 @@ import { validate, ValidationError } from 'class-validator';
 import { IJwtService } from '@services/auth/auth.interface.service';
 import { env } from '@utils/env';
 import { twoDaysInSeconds } from '@utils/util';
-import { RoleEnum, RolePermission } from '@models/role.model';
+import { RoleEnum, IRolePermission } from '@models/role.model';
 
 export const middleware = {
   log: (log: ILogger) => logMiddleware(log),
@@ -16,7 +16,7 @@ export const middleware = {
     requestBodyMiddleware(log, type),
   refreshToken: (log: ILogger, ser: IJwtService) => refreshToken(log, ser),
   hasRole: (log: ILogger, role: RoleEnum) => hasRole(log, role),
-  hasRoleAndPermissions: (log: ILogger, rp: RolePermission) =>
+  hasRoleAndPermissions: (log: ILogger, rp: IRolePermission) =>
     hasRoleAndPermissions(log, rp)
 };
 
@@ -145,8 +145,8 @@ const hasRole = (logger: ILogger, role: RoleEnum): express.RequestHandler => {
 };
 
 const validateRoleAndPermissions = (
-  rp: RolePermission,
-  rps: RolePermission[]
+  rp: IRolePermission,
+  rps: IRolePermission[]
 ) => {
   const matchingRole = rps.find((obj) => obj.role === rp.role);
   if (!matchingRole) return false;
@@ -157,7 +157,7 @@ const validateRoleAndPermissions = (
 
 const hasRoleAndPermissions = (
   logger: ILogger,
-  rp: RolePermission
+  rp: IRolePermission
 ): express.RequestHandler => {
   return (req, res, next) => {
     if (!req.jwtClaim) {

@@ -1,20 +1,20 @@
 import { DevelopmentLogger } from '@utils/log';
-import { PermissionEnum, RoleEnum, RolePermission } from '@models/role.model';
+import { PermissionEnum, RoleEnum, IRolePermission } from '@models/role.model';
 import express from 'express';
-import { JwtObject } from '@models/auth.model';
+import { IJwtObject } from '@models/auth.model';
 import { middleware } from '@middlewares/chain.middleware';
 import request from 'supertest';
 
 describe('hasRole middleware', () => {
   const logger = new DevelopmentLogger();
 
-  const injectClaims = (...rp: RolePermission[]): express.RequestHandler => {
+  const injectClaims = (...rp: IRolePermission[]): express.RequestHandler => {
     return (req, res, next) => {
       req.jwtClaim = {
         obj: {
           user_id: 'uuid',
           access_controls: rp
-        } as JwtObject,
+        } as IJwtObject,
         iss: 'Landscape ERP',
         iat: 4000,
         exp: 8964651
@@ -44,7 +44,7 @@ describe('hasRole middleware', () => {
 
   it('should reject request. not matching role', async () => {
     // given
-    const rp: RolePermission = {
+    const rp: IRolePermission = {
       role: RoleEnum.DEVELOPER,
       permissions: [PermissionEnum.READ, PermissionEnum.WRITE]
     };
@@ -69,7 +69,7 @@ describe('hasRole middleware', () => {
 
   it('should accept matching role', async () => {
     // given
-    const rp: RolePermission = {
+    const rp: IRolePermission = {
       role: RoleEnum.STAFF,
       permissions: [PermissionEnum.READ, PermissionEnum.WRITE]
     };

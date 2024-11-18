@@ -72,8 +72,8 @@ const init = () => {
   }
 
   const log = env.COOKIESECURE
-    ? new LoggerImpl(env.LOGGER)
-    : new DevelopmentLogger();
+    ? new LoggerImpl(env.LOGGER, 'America/Toronto')
+    : new DevelopmentLogger('America/Toronto');
   const db = new DatabaseClient(pool);
   const tx = new TransactionProvider(log, pool);
   const services = initializeServices(log, initializeAdapters(log, db, tx));

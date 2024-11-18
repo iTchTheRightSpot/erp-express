@@ -4,7 +4,7 @@ import { DevelopmentLogger } from '@utils/log';
 import cookieParser from 'cookie-parser';
 import { middleware } from '@middlewares/chain.middleware';
 import { env } from '@utils/env';
-import { JwtClaimsObject, JwtResponse } from '@models/auth.model';
+import { IJwtClaimsObject, IJwtResponse } from '@models/auth.model';
 
 describe('refreshToken middleware', () => {
   let app: express.Express;
@@ -46,7 +46,7 @@ describe('refreshToken middleware', () => {
 
     const obj = {
       exp: Math.floor(expireAt.getTime() / 1000)
-    } as JwtClaimsObject;
+    } as IJwtClaimsObject;
 
     // when
     jwtService.validateJwt.mockResolvedValue(obj);
@@ -66,11 +66,11 @@ describe('refreshToken middleware', () => {
     // given
     const nowInSeconds = Date.now() / 1000;
     const sub5Hrs = nowInSeconds - 5 * 60 * 60;
-    const claims = { exp: sub5Hrs } as JwtClaimsObject;
+    const claims = { exp: sub5Hrs } as IJwtClaimsObject;
 
     // when
     jwtService.validateJwt.mockResolvedValue(claims);
-    jwtService.createJwt.mockResolvedValue({} as JwtResponse);
+    jwtService.createJwt.mockResolvedValue({} as IJwtResponse);
 
     // request
     const res = await request(app)

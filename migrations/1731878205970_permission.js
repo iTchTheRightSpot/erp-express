@@ -47,8 +47,7 @@ exports.up = (pgm) => {
 exports.down = (pgm) => {
   pgm.dropType('permissionenum', { ifExists: true, cascade: true });
   pgm.dropConstraint('permission', 'FK_permission_to_role_role_id', {
-    ifExists: true,
-    cascade: true
+    ifExists: true
   });
   pgm.dropTable('permission', { ifExists: true, cascade: true });
 };

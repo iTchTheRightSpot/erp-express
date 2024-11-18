@@ -1,18 +1,18 @@
-import { RolePermission } from './role.model';
+import { IRolePermission } from './role.model';
 
-export interface JwtObject {
+export interface IJwtObject {
   user_id: string;
-  access_controls: RolePermission[];
+  access_controls: IRolePermission[];
 }
 
-export interface JwtClaimsObject {
-  obj: JwtObject;
+export interface IJwtClaimsObject {
+  obj: IJwtObject;
   iss: string;
   iat: number;
   exp: number;
 }
 
-export interface JwtResponse {
+export interface IJwtResponse {
   token: string;
   exp: Date;
 }

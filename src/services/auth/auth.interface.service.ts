@@ -1,6 +1,9 @@
-import { JwtClaimsObject, JwtObject, JwtResponse } from '@models/auth.model';
+import { IJwtClaimsObject, IJwtObject, IJwtResponse } from '@models/auth.model';
 
 export interface IJwtService {
-  createJwt(obj: JwtObject, expirationInSeconds: number): Promise<JwtResponse>;
-  validateJwt(token: string): Promise<JwtClaimsObject>;
+  createJwt(
+    obj: IJwtObject,
+    expirationInSeconds: number
+  ): Promise<IJwtResponse>;
+  validateJwt(token: string): Promise<IJwtClaimsObject>;
 }

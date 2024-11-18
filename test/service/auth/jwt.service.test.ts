@@ -1,8 +1,8 @@
 import { JwtService } from '@services/auth/auth.service';
 import { DevelopmentLogger } from '@utils/log';
 import { twoDaysInSeconds } from '@utils/util';
-import { PermissionEnum, RoleEnum, RolePermission } from '@models/role.model';
-import { JwtObject } from '@models/auth.model';
+import { PermissionEnum, RoleEnum, IRolePermission } from '@models/role.model';
+import { IJwtObject } from '@models/auth.model';
 
 describe('jwtService', () => {
   const service = new JwtService(new DevelopmentLogger());
@@ -18,8 +18,8 @@ describe('jwtService', () => {
           permissions: [PermissionEnum.WRITE, PermissionEnum.DELETE]
         },
         { role: RoleEnum.USER, permissions: [PermissionEnum.READ] }
-      ] as RolePermission[]
-    } as JwtObject;
+      ] as IRolePermission[]
+    } as IJwtObject;
 
     // method to test & assert
     const res = await service.createJwt(obj, twoDaysInSeconds);

@@ -8,6 +8,8 @@ import { StaffStore } from './staff/staff.store';
 import { RoleStore } from './role/role.store';
 import { IPermissionStore, IRoleStore } from './role/role.interface.store';
 import { PermissionStore } from './role/permission.store';
+import { IShiftStore } from './shift/shift.interface.store';
+import { ShiftStore } from '@stores/shift/shift.store';
 
 /**
  * Holds all classes that directly communicate with the database.
@@ -18,6 +20,7 @@ export interface Adapters {
   roleStore: IRoleStore;
   permissionStore: IPermissionStore;
   staffStore: IStaffStore;
+  shiftStore: IShiftStore;
   txProvider?: ITransactionProvider;
 }
 
@@ -38,6 +41,7 @@ export const initializeAdapters = (
     roleStore: new RoleStore(logger, client),
     permissionStore: new PermissionStore(logger, client),
     staffStore: new StaffStore(logger, client),
+    shiftStore: new ShiftStore(logger, client),
     txProvider: tx
   };
   return store;

@@ -4,7 +4,7 @@ import { IProfileStore } from '@stores/profile/profile.interface.store';
 import { DevelopmentLogger } from '@utils/log';
 import { ProfileStore } from '@stores/profile/profile.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
-import { Profile } from '@models/profile/profile.model';
+import { IProfile } from '@models/profile/profile.model';
 
 describe('user_profile store', () => {
   let pool: Pool;
@@ -34,7 +34,7 @@ describe('user_profile store', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'erp@email.com'
-    } as Profile;
+    } as IProfile;
 
     // method to test
     const save = await store.save(u);
