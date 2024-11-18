@@ -17,6 +17,14 @@ export interface IShift {
   is_reoccurring: boolean;
 }
 
+export interface IShiftResponse {
+  shift_id: number;
+  is_visible: boolean;
+  is_reoccurring: boolean;
+  start: number;
+  end: number;
+}
+
 export interface ISchedulePeriod {
   isVisible: boolean;
   isReoccurring: boolean;

@@ -13,7 +13,7 @@
 
 3. **Staff**
 
-   - Bares minimum to be a staff is to have a role `STAFF`.
+   - Bare minimum to be a staff is to have a role `STAFF`.
    - **Shifts**
      - Only staffs with `WRITE` permission can create working hours for other staffs.
      - Allow bulk creation of shifts with the following constraints:

@@ -72,7 +72,7 @@ describe('shift store', () => {
     await shiftStore.save(shift);
 
     // method to test
-    const count = await shiftStore.countExistingShiftsForStaff(
+    const count = await shiftStore.countShiftsInRange(
       staff.staff_id,
       logger.date(),
       end
@@ -101,7 +101,7 @@ describe('shift store', () => {
     newEnd.setSeconds(end.getSeconds() + 1);
 
     // method to test
-    const count = await shiftStore.countExistingShiftsForStaff(
+    const count = await shiftStore.countShiftsInRange(
       staff.staff_id,
       end,
       newEnd
@@ -113,7 +113,7 @@ describe('shift store', () => {
 
   it('staff shift count should be 0. staff not found', async () => {
     // method to test
-    const count = await shiftStore.countExistingShiftsForStaff(
+    const count = await shiftStore.countShiftsInRange(
       -1,
       new Date(),
       new Date()
@@ -121,5 +121,61 @@ describe('shift store', () => {
 
     // assert
     expect(count).toEqual(0);
+  });
+
+  it('should return shifts in range', async () => {
+    // given
+    const m: Promise<IShift>[] = [];
+
+    for (let i = 0; i < 10; i++) {
+      const start = new Date(2024, 1, i + 1);
+      const end = new Date(start);
+      m[i] = shiftStore.save({
+        staff_id: staff.staff_id,
+        shift_start: start,
+        shift_end: end
+      } as IShift);
+    }
+
+    // save in parallel
+    await Promise.all(m);
+
+    // method to test
+    const all = await shiftStore.shiftsInRange(
+      staff.staff_id,
+      new Date(2024, 1, 1),
+      new Date(2024, 1, 30)
+    );
+
+    // assert
+    expect(all.length).toEqual(10);
+  });
+
+  it('should return no shifts in range. date in the past', async () => {
+    // given
+    const m: Promise<IShift>[] = [];
+
+    for (let i = 0; i < 10; i++) {
+      const start = new Date(2024, 1, i + 1);
+      const end = new Date(start);
+      m[i] = shiftStore.save({
+        staff_id: staff.staff_id,
+        shift_start: start,
+        shift_end: end
+      } as IShift);
+    }
+
+    // parallel save
+    await Promise.all(m);
+
+    // method to test
+    const all = await shiftStore.shiftsInRange(
+      staff.staff_id,
+      new Date(2023, 1, 1),
+      new Date(2023, 1, 30)
+    );
+
+    // assert
+    expect(all.length).toEqual(0);
   });
 });
