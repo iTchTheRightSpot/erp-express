@@ -63,51 +63,57 @@ export class ShiftPayload {
   @IsDefined({ message: 'times has to be defined' })
   @IsNotEmpty({ message: 'times cannot be empty' })
   times: ShiftSegmentPayload[];
-}
 
-export const checkForOverLappingSegments = (
-  dto: ShiftPayload,
-  now: Date,
-  timezone: string
-) => {
-  const result: IShiftPayload = {
-    staffId: dto.staff_id.trim(),
-    times: [] as ISchedulePeriod[]
-  };
-
-  for (let i = 0; i < dto.times.length; i++) {
-    let parse: moment.Moment;
-
-    try {
-      parse = moment.tz(dto.times[i].start, timezone);
-      if (!parse.isValid()) throw new BadRequestException();
-    } catch (e) {
-      throw new BadRequestException(
-        `invalid date ${JSON.stringify(dto.times[i].start)}`
-      );
-    }
-
-    if (parse.toDate() < now)
-      throw new BadRequestException(
-        `${JSON.stringify(dto.times[i].start)} cannot be in the past`
-      );
-
-    const start = parse.toDate();
-    const end = new Date(start);
-    end.setSeconds(end.getSeconds() + dto.times[i].duration);
-
-    if (result.times.some((obj) => start <= obj.end && end >= obj.start))
-      throw new BadRequestException(
-        `${JSON.stringify(dto.times[i].start)} and duration ${JSON.stringify(dto.times[i].duration)} overlap with an existing time period`
-      );
-
-    result.times[i] = {
-      isVisible: dto.times[i].is_visible,
-      isReoccurring: dto.times[i].is_reoccurring,
-      start: start,
-      end: end
-    };
+  constructor(dto?: ShiftPayload) {
+    if (!dto) return;
+    this.staff_id = dto.staff_id;
+    this.times = dto.times;
   }
 
-  return result;
-};
+  checkForOverLappingSegments = (now: Date, timezone: string) => {
+    const result: IShiftPayload = {
+      staffId: this.staff_id.trim(),
+      times: [] as ISchedulePeriod[]
+    };
+
+    for (let i = 0; i < this.times.length; i++) {
+      let parse: moment.Moment;
+
+      const m = moment(this.times[i].start, moment.ISO_8601, true);
+
+      if (!m.isValid())
+        throw new BadRequestException(
+          `${this.times[i].start} has to be in ISO format (ISO 8601)`
+        );
+
+      parse = m.tz(timezone);
+      if (!parse.isValid())
+        throw new BadRequestException(
+          `invalid date ${JSON.stringify(this.times[i].start)}`
+        );
+
+      if (parse.toDate() < now)
+        throw new BadRequestException(
+          `${JSON.stringify(this.times[i].start)} cannot be in the past`
+        );
+
+      const start = parse.toDate();
+      const end = new Date(start);
+      end.setSeconds(end.getSeconds() + this.times[i].duration);
+
+      if (result.times.some((obj) => start <= obj.end && end >= obj.start))
+        throw new BadRequestException(
+          `${JSON.stringify(this.times[i].start)} and duration ${JSON.stringify(this.times[i].duration)} overlap with an existing time period`
+        );
+
+      result.times[i] = {
+        isVisible: this.times[i].is_visible,
+        isReoccurring: this.times[i].is_reoccurring,
+        start: start,
+        end: end
+      };
+    }
+
+    return result;
+  };
+}

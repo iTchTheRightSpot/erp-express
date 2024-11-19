@@ -18,7 +18,7 @@ export class PermissionStore implements IPermissionStore {
 
     return new Promise<IPermission>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(q, p.permission, p.role_id);
+        const res = await this.db.exec(q, p.permission, p.role_id);
 
         const row = res.rows[0] as IPermission;
         row.permission_id = Number(row.permission_id);

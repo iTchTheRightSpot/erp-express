@@ -1,4 +1,4 @@
-# Landscape ERP api powered by Express.js using TypeScript & PostgresSQL
+# Enterprise resource planning (ERP) api powered by Express.js using TypeScript & PostgresSQL
 
 ## Core Requirements
 

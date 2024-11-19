@@ -18,7 +18,7 @@ export class StaffServiceStore implements IStaffServiceStore {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(q, s.staff_id, s.service_id);
+        const res = await this.db.exec(q, s.staff_id, s.service_id);
         const row = res.rows[0] as StaffServiceEntity;
         row.junction_id = Number(row.junction_id);
         row.staff_id = Number(row.staff_id);
@@ -38,7 +38,7 @@ export class StaffServiceStore implements IStaffServiceStore {
   ): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           'SELECT COUNT(*) FROM staff_service WHERE staff_id = $1 AND service_id = $2',
           staffId,
           serviceId

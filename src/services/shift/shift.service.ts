@@ -87,19 +87,17 @@ export class ShiftService implements IShiftService {
 
     try {
       // save
-      const savePromises = dto.times.map((time) =>
-        this.adapters.txProvider!.runInTransaction(async (adapters) => {
+      await this.adapters.txProvider?.runInTransaction(async (adapters) => {
+        for (let i = 0; i < dto.times.length; i++) {
           await adapters.shiftStore.save({
             staff_id: staff.staff_id,
-            shift_start: time.start,
-            shift_end: time.end,
-            is_visible: time.isVisible,
-            is_reoccurring: time.isReoccurring
+            shift_start: dto.times[i].start,
+            shift_end: dto.times[i].end,
+            is_visible: dto.times[i].isVisible,
+            is_reoccurring: dto.times[i].isReoccurring
           } as IShift);
-        })
-      );
-
-      await Promise.all(savePromises);
+        }
+      });
       this.cache.clear();
     } catch (e) {
       this.logger.error(`${JSON.stringify(e)}`);

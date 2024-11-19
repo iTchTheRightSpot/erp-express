@@ -12,13 +12,13 @@ export class ProfileStore implements IProfileStore {
   save(o: IProfile): Promise<IProfile> {
     return new Promise<IProfile>(async (resolve, reject) => {
       const query = `
-        INSERT INTO user_profile (firstname, lastname, email, image_key)
+        INSERT INTO profile (firstname, lastname, email, image_key)
         VALUES ($1, $2, $3, $4)
         RETURNING profile_id, firstname, lastname, email, image_key
     `;
 
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           query.trim(),
           o.firstname,
           o.lastname,
@@ -29,10 +29,10 @@ export class ProfileStore implements IProfileStore {
         const row = res.rows[0] as IProfile;
         row.profile_id = Number(row.profile_id);
         resolve(row);
-        this.logger.log('new insert to user_profile');
+        this.logger.log('new insert to profile');
       } catch (e) {
         this.logger.error(
-          `failed to insert into user_profile: ${JSON.stringify(e)}`
+          `failed to insert into profile: ${JSON.stringify(e)}`
         );
         reject(e);
       }
@@ -42,23 +42,21 @@ export class ProfileStore implements IProfileStore {
   delete(profileId: number): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(
-          'DELETE FROM user_profile WHERE profile_id = $1',
+        const res = await this.db.exec(
+          'DELETE FROM profile WHERE profile_id = $1',
           profileId
         );
 
         const count = res.rowCount;
         if (!count || count === 0) {
-          this.logger.log(`no user_profile with id ${profileId} to delete`);
+          this.logger.log(`no profile with id ${profileId} to delete`);
           return resolve(0);
         }
 
         resolve(count);
-        this.logger.log(
-          `deleted profile_id ${profileId} from user_profile table`
-        );
+        this.logger.log(`deleted profile_id ${profileId} from profile table`);
       } catch (e) {
-        this.logger.error(`failed to delete from user_profile ${e}`);
+        this.logger.error(`failed to delete from profile ${e}`);
         reject(e);
       }
     });

@@ -59,6 +59,9 @@ describe('shift handler', () => {
   });
 
   it('should create a shift for staff', async () => {
+    const date = logger.date();
+    date.setSeconds(date.getSeconds() + 24 * 60 * 60);
+
     // given
     const body = {
       staff_id: staff.uuid,
@@ -66,7 +69,7 @@ describe('shift handler', () => {
         {
           is_visible: true,
           is_reoccurring: true,
-          start: new Date().toISOString(),
+          start: date.toISOString(),
           duration: 3600
         }
       ]

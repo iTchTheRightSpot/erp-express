@@ -19,7 +19,7 @@ export class StaffStore implements IStaffStore {
         `.trim();
 
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           query,
           s.uuid || uuid(),
           s.bio || null,
@@ -45,7 +45,7 @@ export class StaffStore implements IStaffStore {
     return new Promise(async (resolve, reject) => {
       const q = 'SELECT * FROM staff WHERE uuid = $1';
       try {
-        const res = await this.db.execContext(q, uuid.trim());
+        const res = await this.db.exec(q, uuid.trim());
 
         if (!res.rows[0]) {
           this.logger.error(`no staff with uuid ${uuid.trim()} found`);

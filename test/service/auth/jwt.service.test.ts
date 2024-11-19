@@ -10,7 +10,7 @@ describe('jwtService', () => {
   it('should create jwt and decoded', async () => {
     // given
     const obj = {
-      user_id: 'uuid',
+      user_id: '0b2af07b-07dd-46ba-99f4-5ceab2499979',
       access_controls: [
         { role: RoleEnum.STAFF, permissions: [PermissionEnum.WRITE] },
         {

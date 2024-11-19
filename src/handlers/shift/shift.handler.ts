@@ -8,10 +8,7 @@ import {
 import { ILogger } from '@utils/log';
 import { IShiftService } from '@services/shift/shift.interface.service';
 import { middleware } from '@middlewares/chain.middleware';
-import {
-  checkForOverLappingSegments,
-  ShiftPayload
-} from '@models/shift/shift.model';
+import { ShiftPayload } from '@models/shift/shift.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import moment from 'moment-timezone';
 
@@ -120,9 +117,9 @@ export class ShiftHandler {
     next: NextFunction
   ): Promise<void> => {
     try {
+      const dto = new ShiftPayload(req.body as ShiftPayload);
       await this.service.create(
-        checkForOverLappingSegments(
-          req.body as ShiftPayload,
+        dto.checkForOverLappingSegments(
           this.logger.date(),
           this.logger.timezone()
         )

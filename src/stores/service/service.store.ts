@@ -18,7 +18,7 @@ export class ServiceStore implements IServiceStore {
 
     return new Promise<ServiceEntity>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           q,
           s.name.trim(),
           s.price.trim(),
@@ -43,7 +43,7 @@ export class ServiceStore implements IServiceStore {
   serviceByName(name: string): Promise<ServiceEntity | undefined> {
     return new Promise<ServiceEntity | undefined>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           'SELECT * FROM service WHERE name = $1',
           name.trim()
         );
