@@ -7,7 +7,7 @@ import {
 } from 'express';
 import { ILogger } from '@utils/log';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 import { IStaffService } from '@services/staff/staff.interface.service';
 
 export class StaffHandler {

@@ -7,7 +7,7 @@ import {
 } from 'express';
 import { ILogger } from '@utils/log';
 import { IShiftService } from '@services/shift/shift.interface.service';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 import { ShiftPayload } from '@models/shift/shift.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import moment from 'moment-timezone';

@@ -8,7 +8,7 @@ import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import { expressjwt } from 'express-jwt';
 import { initializeHandlers } from '@handlers/handlers';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 
 export const createApp = (logger: ILogger, services: ServicesRegistry) => {
   const app: Application = express();

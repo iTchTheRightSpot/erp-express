@@ -8,7 +8,7 @@ import {
 import { ILogger } from '@utils/log';
 import { IService } from '@services/service/service.interface';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 import { ServicePayload } from '@models/service/service.model';
 
 export class ServiceHandler {

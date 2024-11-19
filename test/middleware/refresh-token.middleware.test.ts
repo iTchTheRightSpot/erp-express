@@ -2,7 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { DevelopmentLogger } from '@utils/log';
 import cookieParser from 'cookie-parser';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 import { env } from '@utils/env';
 import { IJwtClaimsObject, IJwtResponse } from '@models/auth.model';
 

@@ -2,7 +2,7 @@ import { DevelopmentLogger } from '@utils/log';
 import { PermissionEnum, RoleEnum, IRolePermission } from '@models/role.model';
 import express from 'express';
 import { IJwtObject } from '@models/auth.model';
-import { middleware } from '@middlewares/chain.middleware';
+import { middleware } from '@middlewares/middleware';
 import request from 'supertest';
 
 describe('hasRole middleware', () => {
