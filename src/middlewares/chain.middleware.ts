@@ -10,10 +10,10 @@ import { twoDaysInSeconds } from '@utils/util';
 import { RoleEnum, IRolePermission } from '@models/role.model';
 
 export const middleware = {
-  log: (log: ILogger) => logMiddleware(log),
-  error: (log: ILogger) => errorMiddleware(log),
+  log: (log: ILogger) => logger(log),
+  error: (log: ILogger) => error(log),
   requestBody: <T extends object>(log: ILogger, type: ClassConstructor<T>) =>
-    requestBodyMiddleware(log, type),
+    requestBody(log, type),
   refreshToken: (log: ILogger, ser: IJwtService) => refreshToken(log, ser),
   hasRole: (log: ILogger, role: RoleEnum) => hasRole(log, role),
   hasRoleAndPermissions: (log: ILogger, rp: IRolePermission) =>
@@ -21,7 +21,7 @@ export const middleware = {
 };
 
 // ref docs https://expressjs.com/en/resources/middleware/morgan.html
-const logMiddleware = (log: ILogger) => {
+const logger = (log: ILogger) => {
   return morgan(
     (token: any, req: Request, res: Response) => {
       const clientIp =
@@ -46,7 +46,7 @@ const logMiddleware = (log: ILogger) => {
   );
 };
 
-const errorMiddleware = (logger: ILogger): express.ErrorRequestHandler => {
+const error = (logger: ILogger): express.ErrorRequestHandler => {
   return async (
     err: Error,
     _req: Request,
@@ -66,7 +66,7 @@ const errorMiddleware = (logger: ILogger): express.ErrorRequestHandler => {
   };
 };
 
-function requestBodyMiddleware<T extends object>(
+function requestBody<T extends object>(
   log: ILogger,
   type: ClassConstructor<T>
 ): express.RequestHandler {
@@ -79,13 +79,13 @@ function requestBodyMiddleware<T extends object>(
             ? Object.values(errors[0].constraints)[0]
             : 'validation failed';
 
-          log.error(`validator middleware request error ${message}`);
+          log.error(`${requestBody.name} request error ${message}`);
 
           res.status(400).send({ status: 400, message: message });
         } else next();
       })
       .catch((err) => {
-        log.error(`validator middleware catch block ${JSON.stringify(err)}`);
+        log.error(`${requestBody.name} catch block ${JSON.stringify(err)}`);
         res
           .status(400)
           .send({ status: 400, message: 'catch validation failed' });
@@ -124,9 +124,7 @@ const refreshToken = (
           maxAge: twoDaysInSeconds * 1000,
           expires: obj.exp
         });
-        logger.log(
-          `${refreshToken.name}: replacing jwt as it is within 1 day of expiration`
-        );
+        logger.log(`${refreshToken.name}: refreshing token`);
       }
 
       next();
@@ -140,10 +138,12 @@ const refreshToken = (
 const hasRole = (logger: ILogger, role: RoleEnum): express.RequestHandler => {
   return (req, res, next) => {
     if (!req.jwtClaim) {
+      logger.error('access denied jwtClaims not present');
       res.status(403).send({ status: 403, message: 'access denied' });
     } else if (
       !req.jwtClaim.obj.access_controls.some((obj) => obj.role === role)
     ) {
+      logger.error('access denied not matching role');
       res.status(403).send({ status: 403, message: 'access denied' });
     } else next();
   };
@@ -166,10 +166,12 @@ const hasRoleAndPermissions = (
 ): express.RequestHandler => {
   return (req, res, next) => {
     if (!req.jwtClaim) {
+      logger.error('access denied jwtClaims not present in request');
       res.status(403).send({ status: 403, message: 'access denied' });
     } else if (
       !validateRoleAndPermissions(rp, req.jwtClaim!.obj.access_controls)
     ) {
+      logger.error('access denied not matching role or permission');
       res.status(403).send({ status: 403, message: 'access denied' });
     } else next();
   };
