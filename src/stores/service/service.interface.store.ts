@@ -1,5 +1,6 @@
-import { IService } from '@models/service/service.model';
+import { ServiceEntity } from '@models/service/service.model';
 
 export interface IServiceStore {
-  save(s: IService): Promise<IService>;
+  save(s: ServiceEntity): Promise<ServiceEntity>;
+  serviceByName(name: string): Promise<ServiceEntity | undefined>;
 }

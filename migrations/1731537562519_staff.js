@@ -32,10 +32,10 @@ exports.up = (pgm) => {
     }
   );
 
-  pgm.addConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.addConstraint('staff', 'FK_staff_to_profile_profile_id', {
     foreignKeys: {
       columns: 'profile_id',
-      references: 'user_profile(profile_id)',
+      references: 'profile(profile_id)',
       onDelete: 'SET NULL',
       onUpdate: 'RESTRICT'
     }
@@ -48,7 +48,7 @@ exports.up = (pgm) => {
  * @returns {Promise<void> | void}
  */
 exports.down = (pgm) => {
-  pgm.dropConstraint('staff', 'FK_staff_to_user_profile_profile_id', {
+  pgm.dropConstraint('staff', 'FK_staff_to_profile_profile_id', {
     ifExists: true
   });
   pgm.dropTable('staff', { ifExists: true });

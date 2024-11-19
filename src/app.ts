@@ -1,18 +1,14 @@
 import express, { Application, Router } from 'express';
 import { env } from '@utils/env';
-import { DevelopmentLogger, ILogger, LoggerImpl } from '@utils/log';
-import { initializeServices, ServicesRegistry } from '@services/services';
+import { ILogger } from '@utils/log';
+import { ServicesRegistry } from '@services/services';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as path from 'path';
 import cookieParser from 'cookie-parser';
 import { expressjwt } from 'express-jwt';
 import { initializeHandlers } from '@handlers/handlers';
-import { Pool } from 'pg';
-import { middleware } from '@middlewares/chain.middleware';
-import { initializeAdapters } from '@stores/adapters';
-import { DatabaseClient } from '@stores/db-client';
-import { TransactionProvider } from '@stores/transaction';
+import { middleware } from '@middlewares/middleware';
 
 export const createApp = (logger: ILogger, services: ServicesRegistry) => {
   const app: Application = express();
@@ -52,32 +48,3 @@ export const createApp = (logger: ILogger, services: ServicesRegistry) => {
 
   return app;
 };
-
-const init = () => {
-  let pool: Pool;
-  try {
-    pool = new Pool({
-      user: env.DB_CONFIG.user,
-      password: env.DB_CONFIG.password,
-      host: env.DB_CONFIG.host,
-      port: env.DB_CONFIG.port,
-      database: env.DB_CONFIG.database,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000
-    });
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
-
-  const log = env.COOKIESECURE
-    ? new LoggerImpl(env.LOGGER, 'America/Toronto')
-    : new DevelopmentLogger('America/Toronto');
-  const db = new DatabaseClient(pool);
-  const tx = new TransactionProvider(log, pool);
-  const services = initializeServices(log, initializeAdapters(log, db, tx));
-  return createApp(log, services);
-};
-
-export default init;

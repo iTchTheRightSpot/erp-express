@@ -3,7 +3,7 @@ import moment from 'moment-timezone';
 import { ServerException } from '@exceptions/server.exception';
 
 export interface ILogger {
-  timezone(): moment.Moment;
+  timezone(): string;
   date(): Date;
   log(...args: any[]): void;
   error(...args: any[]): void;
@@ -54,8 +54,8 @@ export class LoggerImpl implements ILogger {
     this.logger.error(entry);
   }
 
-  timezone(): moment.Moment {
-    return this.momentTimeZone;
+  timezone(): string {
+    return this.momentTimeZone.tz()!;
   }
 }
 
@@ -101,7 +101,7 @@ export class DevelopmentLogger implements ILogger {
     console.error(entry);
   }
 
-  timezone(): moment.Moment {
-    return this.momentTimeZone;
+  timezone(): string {
+    return this.momentTimeZone.tz()!;
   }
 }

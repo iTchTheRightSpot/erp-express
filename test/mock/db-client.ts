@@ -4,7 +4,7 @@ import { PoolClient, QueryResult } from 'pg';
 export class MockLiveDatabaseClient implements IDatabaseClient {
   constructor(private readonly client: PoolClient) {}
 
-  execContext(query: string, ...args: any[]): Promise<QueryResult> {
+  exec(query: string, ...args: any[]): Promise<QueryResult> {
     return new Promise(async (resolve, reject) => {
       try {
         const q = await this.client.query(query, [...args]);

@@ -1,5 +1,5 @@
 import { ServicePayload } from '@models/service/service.model';
 
-export interface IServiceOffered {
+export interface IService {
   create(p: ServicePayload): Promise<void>;
 }

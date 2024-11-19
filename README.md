@@ -1,4 +1,4 @@
-# Landscape ERP api powered by Express.js using TypeScript & PostgresSQL
+# Enterprise resource planning (ERP) api powered by Express.js version 4.21.1 using TypeScript & PostgresSQL
 
 ## Core Requirements
 
@@ -13,7 +13,7 @@
 
 3. **Staff**
 
-   - Bares minimum to be a staff is to have a role `STAFF`.
+   - Bare minimum to be a staff is to have a role `STAFF`.
    - **Shifts**
      - Only staffs with `WRITE` permission can create working hours for other staffs.
      - Allow bulk creation of shifts with the following constraints:
@@ -58,7 +58,7 @@
    - Only staffs can send invoices to clients.
    - Clients should be able to pay via online invoice.
 
-## Docs
+## Development docs
 
 1. [Schema design](https://dbdiagram.io/d/landscape-erp-66303ee65b24a634d01e83ea).
 2. [PG getting started](https://node-postgres.com/).

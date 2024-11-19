@@ -31,7 +31,7 @@ exports.up = (pgm) => {
 
   pgm.addConstraint('permission', 'FK_permission_to_role_role_id', {
     foreignKeys: {
-      columns: 'permission_id',
+      columns: 'role_id',
       references: 'role(role_id)',
       onDelete: 'CASCADE',
       onUpdate: 'RESTRICT'
