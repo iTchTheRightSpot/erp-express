@@ -14,18 +14,16 @@ export class ServiceImpl implements IService {
 
   async create(p: ServicePayload): Promise<void> {
     try {
-      await this.adapters.txProvider?.runInTransaction(async (adapters) => {
-        await adapters.serviceStore.save({
-          name: p.name,
-          price: p.price.trim(),
-          is_visible: p.is_visible,
-          duration: p.duration,
-          clean_up_time: p.clean_up_time
-        } as ServiceEntity);
-      });
+      await this.adapters.serviceStore.save({
+        name: p.name,
+        price: p.price.trim(),
+        is_visible: p.is_visible,
+        duration: p.duration,
+        clean_up_time: p.clean_up_time
+      } as ServiceEntity);
       this.cache.clear();
     } catch (e) {
-      throw new InsertionException('service not saved');
+      throw new InsertionException(`error saving ${p.name}`);
     }
   }
 }

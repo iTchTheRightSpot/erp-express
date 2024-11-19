@@ -47,16 +47,21 @@ const logMiddleware = (log: ILogger) => {
 };
 
 const errorMiddleware = (logger: ILogger): express.ErrorRequestHandler => {
-  return (
-    err: HttpException,
-    req: Request,
+  return async (
+    err: Error,
+    _req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    const status = err.status || 500;
-    const message = err.message || 'something went wrong';
-    logger.error(err.stack);
-    res.status(status).send({ message: message, status: status });
+    if (err instanceof HttpException) {
+      const status = err.status;
+      const message = err.message;
+      logger.error(err.stack);
+      res.status(status).send({ message: message, status: status });
+    } else {
+      logger.error(err.stack);
+      res.status(500).send({ message: 'something went wrong', status: 500 });
+    }
     next();
   };
 };

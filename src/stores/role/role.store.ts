@@ -18,7 +18,7 @@ export class RoleStore implements IRoleStore {
       `;
 
       try {
-        const result = await this.db.execContext(q, obj.role, obj.profile_id);
+        const result = await this.db.exec(q, obj.role, obj.profile_id);
         const row = result.rows[0] as IRole;
         row.role_id = Number(row.role_id);
         row.profile_id = Number(row.profile_id);

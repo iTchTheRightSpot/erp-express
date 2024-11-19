@@ -13,7 +13,7 @@ export interface IDatabaseClient {
    * @returns A promise that resolves to a {@link QueryResult} object, containing the result
    *          of the executed query, or rejects with an error if execution fails.
    */
-  execContext(query: string, ...args: any[]): Promise<QueryResult>;
+  exec(query: string, ...args: any[]): Promise<QueryResult>;
 }
 
 /**
@@ -22,14 +22,14 @@ export interface IDatabaseClient {
  * require a transaction context. The {@link DatabaseClient} class manages the lifecycle of the connection,
  * releasing it after each operation to prevent connection leaks.
  *
- * When using this class, each call to {@link execContext} will release the database connection after the
+ * When using this class, each call to {@link exec} will release the database connection after the
  * operation completes, regardless of success or failure. This ensures that connections are not
  * held unnecessarily and can be returned to the connection pool for reuse.
  */
 export class DatabaseClient implements IDatabaseClient {
   constructor(private readonly pool: Pool) {}
 
-  execContext(query: string, ...args: any[]): Promise<QueryResult> {
+  exec(query: string, ...args: any[]): Promise<QueryResult> {
     return new Promise(async (resolve, reject) => {
       try {
         const q = await this.pool.query(query, [...args]);
@@ -52,7 +52,7 @@ export class DatabaseClient implements IDatabaseClient {
 export class DatabaseTransactionClient implements IDatabaseClient {
   constructor(private readonly client: PoolClient) {}
 
-  execContext(query: string, ...args: any[]): Promise<QueryResult> {
+  exec(query: string, ...args: any[]): Promise<QueryResult> {
     return new Promise(async (resolve, reject) => {
       try {
         const q = await this.client.query(query, [...args]);

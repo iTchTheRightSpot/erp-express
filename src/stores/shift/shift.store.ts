@@ -18,7 +18,7 @@ export class ShiftStore implements IShiftStore {
 
     return new Promise<IShift>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(
+        const res = await this.db.exec(
           q,
           s.shift_start,
           s.shift_end,
@@ -52,7 +52,7 @@ export class ShiftStore implements IShiftStore {
 
     return new Promise<number>(async (resolve, reject) => {
       try {
-        const res = await this.db.execContext(q, staffId, start, end);
+        const res = await this.db.exec(q, staffId, start, end);
         const row = res.rows[0];
         if (!row) {
           reject(-1);
@@ -78,7 +78,7 @@ export class ShiftStore implements IShiftStore {
 
     return new Promise<IShift[]>(async (resolve, reject) => {
       try {
-        const result = await this.db.execContext(q, staffId, start, end);
+        const result = await this.db.exec(q, staffId, start, end);
 
         if (!result.rows) {
           resolve([] as IShift[]);

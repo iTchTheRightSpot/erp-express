@@ -6,7 +6,7 @@ import { ProfileStore } from '@stores/profile/profile.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { IProfile } from '@models/profile/profile.model';
 
-describe('user_profile store', () => {
+describe('profile store', () => {
   let pool: Pool;
   let client: PoolClient;
   let store: IProfileStore;
@@ -29,7 +29,7 @@ describe('user_profile store', () => {
     await pool.end();
   });
 
-  it('should create a user_profile and delete user_profile by profile_id', async () => {
+  it('should create a profile and delete profile by profile_id', async () => {
     const u = {
       firstname: 'firstname',
       lastname: 'lastname',
