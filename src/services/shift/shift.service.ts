@@ -100,7 +100,7 @@ export class ShiftService implements IShiftService {
       });
       this.cache.clear();
     } catch (e) {
-      this.logger.error(`${JSON.stringify(e)}`);
+      this.logger.error(`${e}`);
       throw new InsertionException('error saving shift');
     }
   }
