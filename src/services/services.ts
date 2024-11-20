@@ -11,7 +11,7 @@ import { IStaffService } from './staff/staff.interface.service';
 import { StaffService } from './staff/staff.service';
 import { IReservationService } from './reservation/reservation.interface.service';
 import { ReservationService } from './reservation/reservation.service';
-import { MailService } from '@services/mail/mail.service';
+import { MailService } from './mail/mail.service';
 
 export interface ServicesRegistry {
   jwtService: IJwtService;

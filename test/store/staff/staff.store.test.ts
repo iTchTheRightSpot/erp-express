@@ -16,7 +16,7 @@ import { ServiceStore } from '@stores/service/service.store';
 import { StaffServiceStore } from '@stores/staff/staff-service.store';
 import { ServiceEntity } from '@models/service/service.model';
 
-describe('staff store', () => {
+describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
   let pool: Pool;
   let client: PoolClient;
   let profile: ProfileEntity;
@@ -52,53 +52,85 @@ describe('staff store', () => {
     await pool.end();
   });
 
-  it('should save staff & find by uuid', async () => {
-    // method to test
-    const staff = await staffStore.save({
-      profile_id: profile.profile_id
-    } as StaffEntity);
+  describe(`${StaffStore.name}`, () => {
+    it('should save staff & find by uuid', async () => {
+      // method to test
+      const staff = await staffStore.save({
+        profile_id: profile.profile_id
+      } as StaffEntity);
 
-    // assert
-    expect(staff.staff_id).toBeGreaterThan(0);
+      // assert
+      expect(staff.staff_id).toBeGreaterThan(0);
 
-    // method to test
-    const find = await staffStore.staffByUUID(staff.uuid);
+      // method to test
+      const find = await staffStore.staffByUUID(staff.uuid);
 
-    // assert
-    expect(staff).toEqual(find);
+      // assert
+      expect(staff).toEqual(find);
+    });
   });
 
-  it('should save to staff_service table & find by staff_id and service_id', async () => {
-    // given
-    const staff = await staffStore.save({} as StaffEntity);
-    const erp = await serviceStore.save({
-      name: 'erp',
-      price: '45.69',
-      duration: 3600,
-      clean_up_time: 30 * 60
-    } as ServiceEntity);
+  describe(`${StaffServiceStore.name}`, () => {
+    it('should save to staff_service table & find by staff_id and service_id', async () => {
+      // given
+      const staff = await staffStore.save({} as StaffEntity);
+      const erp = await serviceStore.save({
+        name: 'erp',
+        price: '45.69',
+        duration: 3600,
+        clean_up_time: 30 * 60
+      } as ServiceEntity);
 
-    // method to test
-    const save = await staffServiceStore.save({
-      staff_id: staff.staff_id,
-      service_id: erp.service_id
-    } as StaffServiceEntity);
+      // method to test
+      const save = await staffServiceStore.save({
+        staff_id: staff.staff_id,
+        service_id: erp.service_id
+      } as StaffServiceEntity);
 
-    // assert
-    expect(save.junction_id).toBeGreaterThan(0);
+      // assert
+      expect(save.junction_id).toBeGreaterThan(0);
 
-    // method to test
-    const count = await staffServiceStore.countByStaffIdAndServiceId(
-      staff.staff_id,
-      erp.service_id
-    );
-    const fakeCount = await staffServiceStore.countByStaffIdAndServiceId(
-      staff.staff_id,
-      0
-    );
+      // method to test
+      const count = await staffServiceStore.countByStaffIdAndServiceId(
+        staff.staff_id,
+        erp.service_id
+      );
+      const fakeCount = await staffServiceStore.countByStaffIdAndServiceId(
+        staff.staff_id,
+        0
+      );
 
-    // assert
-    expect(count).toEqual(1);
-    expect(fakeCount).toEqual(0);
+      // assert
+      expect(count).toEqual(1);
+      expect(fakeCount).toEqual(0);
+    });
+
+    it('should return all services offered by staff', async () => {
+      // given
+      const staff = await staffStore.save({} as StaffEntity);
+      const erp = await serviceStore.save({
+        name: 'erp',
+        price: '45.69',
+        duration: 3600,
+        clean_up_time: 30 * 60
+      } as ServiceEntity);
+
+      // method to test
+      const find = await staffServiceStore.servicesByStaffId(staff.staff_id);
+
+      // assert
+      expect(find.length).toEqual(0);
+
+      // assign service to staff
+      await staffServiceStore.save({
+        staff_id: staff.staff_id,
+        service_id: erp.service_id
+      } as StaffServiceEntity);
+
+      // method to test & assert
+      const res = await staffServiceStore.servicesByStaffId(staff.staff_id);
+      expect(res.length).toEqual(1);
+      expect(res[0]).toEqual('erp');
+    });
   });
 });

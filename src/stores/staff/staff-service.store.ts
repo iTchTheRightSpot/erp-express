@@ -53,4 +53,29 @@ export class StaffServiceStore implements IStaffServiceStore {
       }
     });
   }
+
+  servicesByStaffId(staffId: number): Promise<string[]> {
+    const q = `
+      SELECT s.name FROM service s
+      INNER JOIN staff_service ss ON ss.service_id = s.service_id
+      WHERE ss.staff_id = $1
+    `;
+
+    return new Promise<string[]>(async (resolve, reject) => {
+      try {
+        const res = await this.db.exec(q, staffId);
+        if (!res.rows) {
+          resolve([] as string[]);
+          return;
+        }
+        const rows = res.rows;
+        resolve(rows.map((r) => r.name));
+      } catch (e) {
+        this.logger.error(
+          `exception retrieving service by staff id ${staffId}, err: ${e}`
+        );
+        reject(e);
+      }
+    });
+  }
 }

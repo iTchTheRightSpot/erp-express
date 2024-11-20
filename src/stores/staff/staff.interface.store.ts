@@ -11,4 +11,5 @@ export interface IStaffServiceStore {
     staffId: number,
     serviceId: number
   ): Promise<number>;
+  servicesByStaffId(staffId: number): Promise<string[]>;
 }
