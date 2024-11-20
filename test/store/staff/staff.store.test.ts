@@ -60,7 +60,7 @@ describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
       } as StaffEntity);
 
       // assert
-      expect(staff.staff_id).toBeGreaterThan(0);
+      expect(Number(staff.staff_id)).toBeGreaterThan(0);
 
       // method to test
       const find = await staffStore.staffByUUID(staff.uuid);
@@ -88,7 +88,7 @@ describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
       } as StaffServiceEntity);
 
       // assert
-      expect(save.junction_id).toBeGreaterThan(0);
+      expect(Number(save.junction_id)).toBeGreaterThan(0);
 
       // method to test
       const count = await staffServiceStore.countByStaffIdAndServiceId(
@@ -97,40 +97,12 @@ describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
       );
       const fakeCount = await staffServiceStore.countByStaffIdAndServiceId(
         staff.staff_id,
-        0
+        '0'
       );
 
       // assert
       expect(count).toEqual(1);
       expect(fakeCount).toEqual(0);
-    });
-
-    it('should return all services offered by staff', async () => {
-      // given
-      const staff = await staffStore.save({} as StaffEntity);
-      const erp = await serviceStore.save({
-        name: 'erp',
-        price: '45.69',
-        duration: 3600,
-        clean_up_time: 30 * 60
-      } as ServiceEntity);
-
-      // method to test
-      const find = await staffServiceStore.servicesByStaffId(staff.staff_id);
-
-      // assert
-      expect(find.length).toEqual(0);
-
-      // assign service to staff
-      await staffServiceStore.save({
-        staff_id: staff.staff_id,
-        service_id: erp.service_id
-      } as StaffServiceEntity);
-
-      // method to test & assert
-      const res = await staffServiceStore.servicesByStaffId(staff.staff_id);
-      expect(res.length).toEqual(1);
-      expect(res[0]).toEqual('erp');
     });
   });
 });

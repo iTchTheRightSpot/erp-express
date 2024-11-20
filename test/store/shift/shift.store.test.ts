@@ -49,7 +49,7 @@ describe('shift store', () => {
     const save = await shiftStore.save(shift);
 
     // assert
-    expect(save.shift_id).toBeGreaterThan(0);
+    expect(Number(save.shift_id)).toBeGreaterThan(0);
   });
 
   it('staff shift count should be equal to 2', async () => {
@@ -114,7 +114,7 @@ describe('shift store', () => {
   it('staff shift count should be 0. staff not found', async () => {
     // method to test
     const count = await shiftStore.countShiftsInRange(
-      -1,
+      '-1',
       new Date(),
       new Date()
     );

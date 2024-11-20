@@ -19,12 +19,7 @@ export class StaffServiceStore implements IStaffServiceStore {
     return new Promise(async (resolve, reject) => {
       try {
         const res = await this.db.exec(q, s.staff_id, s.service_id);
-        const row = res.rows[0] as StaffServiceEntity;
-        row.junction_id = Number(row.junction_id);
-        row.staff_id = Number(row.staff_id);
-        row.service_id = Number(row.service_id);
-
-        resolve(row);
+        resolve(res.rows[0] as StaffServiceEntity);
       } catch (e) {
         this.logger.error(`exception saving to staff_service table ${e}`);
         reject(e);
@@ -33,8 +28,8 @@ export class StaffServiceStore implements IStaffServiceStore {
   }
 
   countByStaffIdAndServiceId(
-    staffId: number,
-    serviceId: number
+    staffId: string,
+    serviceId: string
   ): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
@@ -48,31 +43,6 @@ export class StaffServiceStore implements IStaffServiceStore {
       } catch (e) {
         this.logger.error(
           `exception counting StaffServiceEntity by staffId and serviceId ${e}`
-        );
-        reject(e);
-      }
-    });
-  }
-
-  servicesByStaffId(staffId: number): Promise<string[]> {
-    const q = `
-      SELECT s.name FROM service s
-      INNER JOIN staff_service ss ON ss.service_id = s.service_id
-      WHERE ss.staff_id = $1
-    `;
-
-    return new Promise<string[]>(async (resolve, reject) => {
-      try {
-        const res = await this.db.exec(q, staffId);
-        if (!res.rows) {
-          resolve([] as string[]);
-          return;
-        }
-        const rows = res.rows;
-        resolve(rows.map((r) => r.name));
-      } catch (e) {
-        this.logger.error(
-          `exception retrieving service by staff id ${staffId}, err: ${e}`
         );
         reject(e);
       }

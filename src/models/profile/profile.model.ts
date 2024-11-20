@@ -1,5 +1,5 @@
 export interface ProfileEntity {
-  profile_id: number;
+  profile_id: string;
   firstname: string;
   lastname: string;
   email: string;

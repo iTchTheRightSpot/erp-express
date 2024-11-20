@@ -26,12 +26,7 @@ export class ShiftStore implements IShiftStore {
           s.is_reoccurring === undefined ? false : s.is_reoccurring,
           s.staff_id
         );
-
-        const row = res.rows[0] as ShiftEntity;
-        row.shift_id = Number(row.shift_id);
-        row.staff_id = Number(row.staff_id);
-
-        resolve(row);
+        resolve(res.rows[0] as ShiftEntity);
         this.logger.log('new shift save');
       } catch (e) {
         this.logger.error(`exception saving shift ${JSON.stringify(e)}`);
@@ -40,7 +35,7 @@ export class ShiftStore implements IShiftStore {
     });
   }
 
-  countShiftsInRange(staffId: number, start: Date, end: Date): Promise<number> {
+  countShiftsInRange(staffId: string, start: Date, end: Date): Promise<number> {
     const q = `
         SELECT COUNT(s.shift_id) FROM shift s
         WHERE s.staff_id = $1
@@ -67,7 +62,7 @@ export class ShiftStore implements IShiftStore {
   }
 
   shiftsInRange(
-    staffId: number,
+    staffId: string,
     start: Date,
     end: Date
   ): Promise<ShiftEntity[]> {

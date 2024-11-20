@@ -27,7 +27,6 @@ export class ProfileStore implements IProfileStore {
         );
 
         const row = res.rows[0] as ProfileEntity;
-        row.profile_id = Number(row.profile_id);
         resolve(row);
         this.logger.log('new insert to profile');
       } catch (e) {
@@ -39,7 +38,7 @@ export class ProfileStore implements IProfileStore {
     });
   }
 
-  delete(profileId: number): Promise<number> {
+  delete(profileId: string): Promise<number> {
     return new Promise<number>(async (resolve, reject) => {
       try {
         const res = await this.db.exec(

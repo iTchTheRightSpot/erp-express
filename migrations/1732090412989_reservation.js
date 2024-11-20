@@ -50,8 +50,13 @@ exports.up = (pgm) => {
   pgm.createIndex('reservation', ['email'], {
     name: 'IX_reservation_email'
   });
+  pgm.createIndex(
+    'reservation',
+    ['staff_id', 'scheduled_for', 'expire_at', 'status'],
+    { name: 'IX_reservation_composite1' }
+  );
   pgm.createIndex('reservation', ['email', 'scheduled_for', 'expire_at'], {
-    name: 'IX_reservation_composite1'
+    name: 'IX_reservation_composite2'
   });
 };
 
@@ -70,6 +75,10 @@ exports.down = (pgm) => {
   });
   pgm.dropIndex('reservation', null, {
     name: 'IX_reservation_composite1',
+    ifExists: true
+  });
+  pgm.dropIndex('reservation', null, {
+    name: 'IX_reservation_composite2',
     ifExists: true
   });
   pgm.dropTable('reservation', { ifExists: true });

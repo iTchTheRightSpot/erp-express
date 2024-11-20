@@ -8,8 +8,7 @@ export interface IStaffStore {
 export interface IStaffServiceStore {
   save(s: StaffServiceEntity): Promise<StaffServiceEntity>;
   countByStaffIdAndServiceId(
-    staffId: number,
-    serviceId: number
+    staffId: string,
+    serviceId: string
   ): Promise<number>;
-  servicesByStaffId(staffId: number): Promise<string[]>;
 }

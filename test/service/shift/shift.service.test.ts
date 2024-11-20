@@ -55,7 +55,7 @@ describe('shift service', () => {
 
     // when
     adapters.staffStore.staffByUUID.mockResolvedValue({
-      staff_id: 1
+      staff_id: '1'
     } as StaffEntity);
     adapters.shiftStore.countShiftsInRange.mockResolvedValue(1);
 
@@ -82,7 +82,7 @@ describe('shift service', () => {
 
     // when
     adapters.staffStore.staffByUUID.mockResolvedValue({
-      staff_id: 1
+      staff_id: '1'
     } as StaffEntity);
     adapters.shiftStore.countShiftsInRange.mockResolvedValue(0);
     adapters.txProvider.runInTransaction.mockImplementation(

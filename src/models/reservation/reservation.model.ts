@@ -14,8 +14,8 @@ export enum ReservationEnum {
 }
 
 export interface ReservationEntity {
-  reservation_id: number;
-  staff_id: number;
+  reservation_id: string;
+  staff_id: string;
   name: string;
   email: string;
   description: string | null;
@@ -30,9 +30,9 @@ export interface ReservationEntity {
 }
 
 export interface ServiceReservationEntity {
-  junction_id: number;
-  reservation_id: number;
-  service_id: number;
+  junction_id: string;
+  reservation_id: string;
+  service_id: string;
 }
 
 export class ReservationPayload {
@@ -42,6 +42,12 @@ export class ReservationPayload {
   @MinLength(36, { message: 'staff_id must be at min 36 characters' })
   @MaxLength(37, { message: 'staff_id must be at most 37 characters' })
   staff_id: string;
+
+  @IsDefined({ message: 'name has to be defined' })
+  @IsNotEmpty({ message: 'name cannot be empty' })
+  @IsString({ message: 'name has to be a string' })
+  @MaxLength(100, { message: 'name must be at most 100 characters' })
+  name: string;
 
   @IsDefined({ message: 'email has to be defined' })
   @IsNotEmpty({ message: 'email cannot be empty' })

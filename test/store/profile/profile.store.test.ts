@@ -40,7 +40,7 @@ describe('profile store', () => {
     const save = await store.save(u);
 
     // assert
-    expect(save.profile_id).toBeGreaterThan(0);
+    expect(Number(save.profile_id)).toBeGreaterThan(0);
     expect(save.firstname).toEqual(u.firstname);
     expect(save.lastname).toEqual(u.lastname);
     expect(save.email).toEqual(u.email);

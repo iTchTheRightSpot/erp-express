@@ -1,7 +1,7 @@
 import { IsDefined, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export interface ServiceEntity {
-  service_id: number;
+  service_id: string;
   name: string;
   price: string;
   is_visible: boolean;

@@ -19,13 +19,7 @@ export class ServiceReservationStore implements IServiceReservationStore {
 
       try {
         const res = await this.db.exec(q, s.reservation_id, s.service_id);
-
-        const row = res.rows[0] as ServiceReservationEntity;
-        row.junction_id = Number(row.junction_id);
-        row.reservation_id = Number(row.reservation_id);
-        row.service_id = Number(row.service_id);
-
-        resolve(row);
+        resolve(res.rows[0] as ServiceReservationEntity);
       } catch (e) {
         this.logger.error(`exception saving to service_reservation ${e}`);
         reject(e);

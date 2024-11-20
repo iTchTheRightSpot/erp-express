@@ -9,8 +9,8 @@ import { BadRequestException } from '@exceptions/bad-request.exception';
 import moment from 'moment-timezone';
 
 export interface ShiftEntity {
-  shift_id: number;
-  staff_id: number;
+  shift_id: string;
+  staff_id: string;
   shift_start: Date;
   shift_end: Date;
   is_visible: boolean;
@@ -18,7 +18,7 @@ export interface ShiftEntity {
 }
 
 export interface IShiftResponse {
-  shift_id: number;
+  shift_id: string;
   is_visible: boolean;
   is_reoccurring: boolean;
   start: number;

@@ -26,11 +26,7 @@ export class StaffStore implements IStaffStore {
           s.profile_id || null
         );
 
-        const row = res.rows[0] as StaffEntity;
-        row.staff_id = Number(row.staff_id);
-        row.profile_id = Number(row.profile_id);
-
-        resolve(row);
+        resolve(res.rows[0] as StaffEntity);
         this.logger.log('new staff saved');
       } catch (e) {
         this.logger.error(
@@ -53,9 +49,7 @@ export class StaffStore implements IStaffStore {
         }
 
         const row = res.rows[0] as StaffEntity;
-        row.staff_id = Number(row.staff_id);
-        row.profile_id =
-          row.profile_id !== null ? Number(row.profile_id) : null;
+        row.profile_id = row.profile_id !== null ? row.profile_id : null;
 
         resolve(row);
         this.logger.log(`staff with id ${uuid.trim()} retrieved`);

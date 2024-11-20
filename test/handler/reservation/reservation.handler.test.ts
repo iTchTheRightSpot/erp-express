@@ -35,6 +35,7 @@ describe('reservation handler', () => {
     // given
     const body = {
       staff_id: '0b2af07b-07dd-46ba-99f4-5ceab2499979',
+      name: 'hello-world',
       email: 'erp@email.com',
       services: ['erp', 'small talks'],
       timezone: 'America/Toronto',
