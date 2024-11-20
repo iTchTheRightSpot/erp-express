@@ -1,5 +1,5 @@
 import { IShiftStore } from './shift.interface.store';
-import { IShift } from '@models/shift/shift.model';
+import { ShiftEntity } from '@models/shift/shift.model';
 import { ILogger } from '@utils/log';
 import { IDatabaseClient } from '@stores/db-client';
 
@@ -9,14 +9,14 @@ export class ShiftStore implements IShiftStore {
     private readonly db: IDatabaseClient
   ) {}
 
-  save(s: IShift): Promise<IShift> {
+  save(s: ShiftEntity): Promise<ShiftEntity> {
     const q = `
       INSERT INTO shift (shift_start, shift_end, is_visible, is_reoccurring, staff_id)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING shift_id, shift_start, shift_end, is_visible, is_reoccurring, staff_id
     `;
 
-    return new Promise<IShift>(async (resolve, reject) => {
+    return new Promise<ShiftEntity>(async (resolve, reject) => {
       try {
         const res = await this.db.exec(
           q,
@@ -27,7 +27,7 @@ export class ShiftStore implements IShiftStore {
           s.staff_id
         );
 
-        const row = res.rows[0] as IShift;
+        const row = res.rows[0] as ShiftEntity;
         row.shift_id = Number(row.shift_id);
         row.staff_id = Number(row.staff_id);
 
@@ -66,7 +66,11 @@ export class ShiftStore implements IShiftStore {
     });
   }
 
-  shiftsInRange(staffId: number, start: Date, end: Date): Promise<IShift[]> {
+  shiftsInRange(
+    staffId: number,
+    start: Date,
+    end: Date
+  ): Promise<ShiftEntity[]> {
     const q = `
       SELECT * FROM shift s
       WHERE s.staff_id = $1
@@ -76,16 +80,16 @@ export class ShiftStore implements IShiftStore {
       )
     `;
 
-    return new Promise<IShift[]>(async (resolve, reject) => {
+    return new Promise<ShiftEntity[]>(async (resolve, reject) => {
       try {
         const result = await this.db.exec(q, staffId, start, end);
 
         if (!result.rows) {
-          resolve([] as IShift[]);
+          resolve([] as ShiftEntity[]);
           return;
         }
 
-        resolve(result.rows as IShift[]);
+        resolve(result.rows as ShiftEntity[]);
       } catch (e) {
         this.logger.error(`exception retrieving shifts in range ${e}`);
         reject(e);

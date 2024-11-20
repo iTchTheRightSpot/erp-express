@@ -23,7 +23,7 @@ exports.up = (pgm) => {
       name: { type: 'VARCHAR(100)', notNull: false, unique: false },
       email: { type: 'VARCHAR(320)', notNull: false, unique: false },
       description: { type: 'VARCHAR(255)', notNull: false, unique: false },
-      address: { type: 'VARCHAR(255)', notNull: true, unique: false },
+      address: { type: 'VARCHAR(255)', notNull: false, unique: false },
       phone: { type: 'VARCHAR(20)', notNull: false, unique: false },
       image_key: { type: 'VARCHAR(37)', notNull: false, unique: false },
       amount_quote: { type: 'DECIMAL(6, 2)', notNull: true, unique: false },

@@ -5,15 +5,15 @@ import { DevelopmentLogger } from '@utils/log';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { StaffStore } from '@stores/staff/staff.store';
 import { IShiftStore } from '@stores/shift/shift.interface.store';
-import { IStaff } from '@models/staff/staff.model';
+import { StaffEntity } from '@models/staff/staff.model';
 import { ShiftStore } from '@stores/shift/shift.store';
-import { IShift } from '@models/shift/shift.model';
+import { ShiftEntity } from '@models/shift/shift.model';
 
 describe('shift store', () => {
   const logger = new DevelopmentLogger();
   let pool: Pool;
   let client: PoolClient;
-  let staff: IStaff;
+  let staff: StaffEntity;
   let staffStore: IStaffStore;
   let shiftStore: IShiftStore;
 
@@ -27,7 +27,7 @@ describe('shift store', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    staff = await staffStore.save({} as IStaff);
+    staff = await staffStore.save({} as StaffEntity);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));
@@ -43,7 +43,7 @@ describe('shift store', () => {
       staff_id: staff.staff_id,
       shift_start: logger.date(),
       shift_end: logger.date()
-    } as IShift;
+    } as ShiftEntity;
 
     // method to test
     const save = await shiftStore.save(shift);
@@ -61,7 +61,7 @@ describe('shift store', () => {
       staff_id: staff.staff_id,
       shift_start: logger.date(),
       shift_end: end
-    } as IShift;
+    } as ShiftEntity;
 
     await shiftStore.save(shift);
 
@@ -91,7 +91,7 @@ describe('shift store', () => {
       staff_id: staff.staff_id,
       shift_start: logger.date(),
       shift_end: end
-    } as IShift;
+    } as ShiftEntity;
 
     await shiftStore.save(shift);
 
@@ -125,7 +125,7 @@ describe('shift store', () => {
 
   it('should return shifts in range', async () => {
     // given
-    const m: Promise<IShift>[] = [];
+    const m: Promise<ShiftEntity>[] = [];
 
     for (let i = 0; i < 10; i++) {
       const start = new Date(2024, 1, i + 1);
@@ -134,7 +134,7 @@ describe('shift store', () => {
         staff_id: staff.staff_id,
         shift_start: start,
         shift_end: end
-      } as IShift);
+      } as ShiftEntity);
     }
 
     // save in parallel
@@ -153,7 +153,7 @@ describe('shift store', () => {
 
   it('should return no shifts in range. date in the past', async () => {
     // given
-    const m: Promise<IShift>[] = [];
+    const m: Promise<ShiftEntity>[] = [];
 
     for (let i = 0; i < 10; i++) {
       const start = new Date(2024, 1, i + 1);
@@ -162,7 +162,7 @@ describe('shift store', () => {
         staff_id: staff.staff_id,
         shift_start: start,
         shift_end: end
-      } as IShift);
+      } as ShiftEntity);
     }
 
     // parallel save

@@ -4,10 +4,10 @@ import { ShiftService } from '@services/shift/shift.service';
 import { NotFoundException } from '@exceptions/not-found.exception';
 import {
   ISchedulePeriod,
-  IShift,
+  ShiftEntity,
   IShiftPayload
 } from '@models/shift/shift.model';
-import { IStaff } from '@models/staff/staff.model';
+import { StaffEntity } from '@models/staff/staff.model';
 import { BadRequestException } from '@exceptions/bad-request.exception';
 
 describe('shift service', () => {
@@ -56,7 +56,7 @@ describe('shift service', () => {
     // when
     adapters.staffStore.staffByUUID.mockResolvedValue({
       staff_id: 1
-    } as IStaff);
+    } as StaffEntity);
     adapters.shiftStore.countShiftsInRange.mockResolvedValue(1);
 
     // method to test & assert
@@ -83,12 +83,12 @@ describe('shift service', () => {
     // when
     adapters.staffStore.staffByUUID.mockResolvedValue({
       staff_id: 1
-    } as IStaff);
+    } as StaffEntity);
     adapters.shiftStore.countShiftsInRange.mockResolvedValue(0);
     adapters.txProvider.runInTransaction.mockImplementation(
       async (callback: any) => await callback(adapters)
     );
-    adapters.shiftStore.save.mockResolvedValue({} as IShift);
+    adapters.shiftStore.save.mockResolvedValue({} as ShiftEntity);
 
     // method to test
     await service.create(dto);

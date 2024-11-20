@@ -8,7 +8,7 @@ import {
 import { BadRequestException } from '@exceptions/bad-request.exception';
 import moment from 'moment-timezone';
 
-export interface IShift {
+export interface ShiftEntity {
   shift_id: number;
   staff_id: number;
   shift_start: Date;

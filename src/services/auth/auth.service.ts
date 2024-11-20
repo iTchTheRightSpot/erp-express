@@ -18,8 +18,8 @@ export class JwtService implements IJwtService {
 
     const claims: IJwtClaimsObject = {
       obj: obj,
-      iss: 'Landscape ERP',
-      iat: Math.floor(date.getTime() / 1000), // convert to epoch seconds. Look at official docs for ref. (README)
+      iss: 'Enterprise Resource Planning',
+      iat: Math.floor(date.getTime() / 1000),
       exp: Math.floor(expireAt.getTime() / 1000)
     };
 
@@ -30,7 +30,7 @@ export class JwtService implements IJwtService {
 
   async validateJwt(token: string): Promise<IJwtClaimsObject> {
     try {
-      const obj = await jwt.verify(token, env.JWT_PUB_KEY);
+      const obj = jwt.verify(token, env.JWT_PUB_KEY);
       return obj as IJwtClaimsObject;
     } catch (e) {
       this.logger.error(`${JwtService.name} ${e}`);

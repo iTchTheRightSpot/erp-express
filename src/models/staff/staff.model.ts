@@ -1,4 +1,4 @@
-export interface IStaff {
+export interface StaffEntity {
   staff_id: number;
   uuid: string;
   bio: string | null;

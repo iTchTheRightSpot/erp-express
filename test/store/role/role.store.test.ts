@@ -5,7 +5,7 @@ import {
   IPermissionStore,
   IRoleStore
 } from '@stores/role/role.interface.store';
-import { IProfile } from '@models/profile/profile.model';
+import { ProfileEntity } from '@models/profile/profile.model';
 import { RoleStore } from '@stores/role/role.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { ProfileStore } from '@stores/profile/profile.store';
@@ -27,7 +27,7 @@ describe('user_role store', () => {
   let roleStore: IRoleStore;
   let dbClient: IDatabaseClient;
   let permissionStore: IPermissionStore;
-  let profile: IProfile;
+  let profile: ProfileEntity;
 
   beforeAll(async () => {
     pool = poolInstance();
@@ -45,7 +45,7 @@ describe('user_role store', () => {
       lastname: 'lastname',
       email: 'erp@email.com',
       image_key: 'image-key'
-    } as IProfile);
+    } as ProfileEntity);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));

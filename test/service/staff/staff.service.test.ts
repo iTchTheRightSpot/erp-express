@@ -2,7 +2,7 @@ import { IStaffService } from '@services/staff/staff.interface.service';
 import { NotFoundException } from '@exceptions/not-found.exception';
 import { StaffService } from '@services/staff/staff.service';
 import { DevelopmentLogger } from '@utils/log';
-import { IStaff, StaffServiceEntity } from '@models/staff/staff.model';
+import { StaffEntity, StaffServiceEntity } from '@models/staff/staff.model';
 import { InsertionException } from '@exceptions/insertion.exception';
 import { ServiceEntity } from '@models/service/service.model';
 
@@ -41,7 +41,7 @@ describe('staff service', () => {
 
   it(`should throw ${NotFoundException.name} when linking service to staff. service name not found`, async () => {
     // when
-    adapters.staffStore.staffByUUID.mockResolvedValue({} as IStaff);
+    adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
     adapters.serviceStore.serviceByName.mockResolvedValue(undefined);
 
     // method to test & assert
@@ -55,7 +55,7 @@ describe('staff service', () => {
 
   it(`should thrown ${InsertionException.name} when linking service to staff. staff already offers service`, async () => {
     // when
-    adapters.staffStore.staffByUUID.mockResolvedValue({} as IStaff);
+    adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
     adapters.serviceStore.serviceByName.mockResolvedValue({} as ServiceEntity);
     adapters.staffServiceStore.countByStaffIdAndServiceId.mockResolvedValue(1);
 
@@ -70,7 +70,7 @@ describe('staff service', () => {
 
   it(`should link service to staff`, async () => {
     // when
-    adapters.staffStore.staffByUUID.mockResolvedValue({} as IStaff);
+    adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
     adapters.serviceStore.serviceByName.mockResolvedValue({} as ServiceEntity);
     adapters.staffServiceStore.countByStaffIdAndServiceId.mockResolvedValue(0);
     adapters.staffServiceStore.save.mockResolvedValue({} as StaffServiceEntity);

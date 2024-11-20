@@ -8,13 +8,13 @@ import { MockLiveDatabaseClient } from '@mock/db-client';
 import { MockLiveTransactionProvider } from '@mock/transaction';
 import { initializeServices } from '@services/services';
 import { createApp } from '@erp/app';
-import { IStaff } from '@models/staff/staff.model';
+import { StaffEntity } from '@models/staff/staff.model';
 import { twoDaysInSeconds } from '@utils/util';
 import { IJwtObject } from '@models/auth.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import { env } from '@utils/env';
 import request from 'supertest';
-import { IShift, IShiftResponse } from '@models/shift/shift.model';
+import { ShiftEntity, IShiftResponse } from '@models/shift/shift.model';
 
 describe('shift handler', () => {
   let app: Application;
@@ -23,7 +23,7 @@ describe('shift handler', () => {
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
   let jwtService: IJwtService;
-  let staff: IStaff;
+  let staff: StaffEntity;
   let token: string;
 
   beforeAll(async () => {
@@ -40,7 +40,7 @@ describe('shift handler', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    staff = await adapters.staffStore.save({} as IStaff);
+    staff = await adapters.staffStore.save({} as StaffEntity);
     const obj: IJwtObject = {
       user_id: staff.uuid,
       access_controls: [
@@ -96,7 +96,7 @@ describe('shift handler', () => {
       staff_id: staff.staff_id,
       shift_start: new Date(),
       shift_end: end
-    } as IShift);
+    } as ShiftEntity);
 
     const body = {
       staff_id: staff.uuid,
@@ -153,7 +153,7 @@ describe('shift handler', () => {
 
     it('success', async () => {
       // given
-      const m: Promise<IShift>[] = [];
+      const m: Promise<ShiftEntity>[] = [];
 
       for (let i = 0; i < 10; i++) {
         const start = new Date(2024, 0, i + 1);
@@ -162,7 +162,7 @@ describe('shift handler', () => {
           staff_id: staff.staff_id,
           shift_start: start,
           shift_end: end
-        } as IShift);
+        } as ShiftEntity);
       }
 
       // parallel save

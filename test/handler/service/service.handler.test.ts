@@ -13,7 +13,7 @@ import { IJwtService } from '@services/auth/auth.interface.service';
 import { IJwtObject } from '@models/auth.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import { twoDaysInSeconds } from '@utils/util';
-import { IStaff } from '@models/staff/staff.model';
+import { StaffEntity } from '@models/staff/staff.model';
 
 describe('service handler', () => {
   let app: Application;
@@ -21,7 +21,7 @@ describe('service handler', () => {
   let client: PoolClient;
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
-  let staff: IStaff;
+  let staff: StaffEntity;
   let jwtService: IJwtService;
 
   beforeAll(async () => {
@@ -37,7 +37,7 @@ describe('service handler', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    staff = await adapters.staffStore.save({} as IStaff);
+    staff = await adapters.staffStore.save({} as StaffEntity);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));

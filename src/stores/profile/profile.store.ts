@@ -1,6 +1,6 @@
 import { IProfileStore } from '@stores/profile/profile.interface.store';
 import { ILogger } from '@utils/log';
-import { IProfile } from '@models/profile/profile.model';
+import { ProfileEntity } from '@models/profile/profile.model';
 import { IDatabaseClient } from '@stores/db-client';
 
 export class ProfileStore implements IProfileStore {
@@ -9,8 +9,8 @@ export class ProfileStore implements IProfileStore {
     private readonly db: IDatabaseClient
   ) {}
 
-  save(o: IProfile): Promise<IProfile> {
-    return new Promise<IProfile>(async (resolve, reject) => {
+  save(o: ProfileEntity): Promise<ProfileEntity> {
+    return new Promise<ProfileEntity>(async (resolve, reject) => {
       const query = `
         INSERT INTO profile (firstname, lastname, email, image_key)
         VALUES ($1, $2, $3, $4)
@@ -26,7 +26,7 @@ export class ProfileStore implements IProfileStore {
           o.image_key || null
         );
 
-        const row = res.rows[0] as IProfile;
+        const row = res.rows[0] as ProfileEntity;
         row.profile_id = Number(row.profile_id);
         resolve(row);
         this.logger.log('new insert to profile');

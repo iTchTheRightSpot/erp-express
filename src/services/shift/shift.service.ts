@@ -1,6 +1,6 @@
 import { IShiftService } from './shift.interface.service';
 import {
-  IShift,
+  ShiftEntity,
   IShiftPayload,
   IShiftResponse
 } from '@models/shift/shift.model';
@@ -50,14 +50,8 @@ export class ShiftService implements IShiftService {
           shift_id: shift.shift_id,
           is_visible: shift.is_visible,
           is_reoccurring: shift.is_reoccurring,
-          start: moment(shift.shift_start)
-            .tz(this.logger.timezone())
-            .tz(timezone)
-            .valueOf(),
-          end: moment(shift.shift_end)
-            .tz(this.logger.timezone())
-            .tz(timezone)
-            .valueOf()
+          start: moment(shift.shift_start).tz(timezone).valueOf(),
+          end: moment(shift.shift_end).tz(timezone).valueOf()
         }) as IShiftResponse
     );
 
@@ -95,7 +89,7 @@ export class ShiftService implements IShiftService {
             shift_end: dto.times[i].end,
             is_visible: dto.times[i].isVisible,
             is_reoccurring: dto.times[i].isReoccurring
-          } as IShift);
+          } as ShiftEntity);
         }
       });
       this.cache.clear();

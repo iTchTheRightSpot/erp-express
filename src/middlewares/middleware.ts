@@ -8,6 +8,7 @@ import { IJwtService } from '@services/auth/auth.interface.service';
 import { env } from '@utils/env';
 import { twoDaysInSeconds } from '@utils/util';
 import { RoleEnum, IRolePermission } from '@models/role.model';
+import { UnauthorizedError } from 'express-jwt';
 
 export const middleware = {
   log: (log: ILogger) => logger(log),
@@ -58,6 +59,9 @@ const error = (logger: ILogger): express.ErrorRequestHandler => {
       const message = err.message;
       logger.error(err.stack);
       res.status(status).send({ message: message, status: status });
+    } else if (err instanceof UnauthorizedError) {
+      logger.error(err.stack);
+      res.status(401).send({ message: err.message, status: 401 });
     } else {
       logger.error(err.stack);
       res.status(500).send({ message: 'something went wrong', status: 500 });
