@@ -19,6 +19,7 @@ import {
   ReservationEnum,
   ServiceReservationEntity
 } from '@models/reservation/reservation.model';
+import Decimal from 'decimal.js';
 
 describe(`${ReservationStore.name} && ${ServiceReservationStore.name} test`, () => {
   let pool: Pool;
@@ -46,7 +47,7 @@ describe(`${ReservationStore.name} && ${ServiceReservationStore.name} test`, () 
     staff = await staffStore.save({} as StaffEntity);
     serviceObj = await serviceStore.save({
       name: 'erp',
-      price: '65.44',
+      price: new Decimal(65.44),
       duration: 3600,
       clean_up_time: 60 * 30
     } as ServiceEntity);
@@ -68,7 +69,7 @@ describe(`${ReservationStore.name} && ${ServiceReservationStore.name} test`, () 
       staff_id: staff.staff_id,
       name: 'erp user',
       email: 'erp@email.com',
-      price: '65.44',
+      price: new Decimal(65.44),
       status: ReservationEnum.CANCELLED,
       created_at: logger.date(),
       scheduled_for: logger.date(),

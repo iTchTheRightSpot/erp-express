@@ -12,6 +12,7 @@ import { BadRequestException } from '@exceptions/bad-request.exception';
 import { StaffEntity } from '@models/staff/staff.model';
 import { ServiceEntity } from '@models/service/service.model';
 import moment from 'moment-timezone';
+import Decimal from 'decimal.js';
 
 describe('reservation service', () => {
   let service: IReservationService;
@@ -127,6 +128,7 @@ describe('reservation service', () => {
     // given
     const dto = {
       staff_id: 'staff-uuid',
+      name: 'erp',
       email: 'erp@email.com',
       services: ['erp', 'star gazing'],
       timezone: 'America/Toronto',
@@ -136,8 +138,8 @@ describe('reservation service', () => {
     // when
     adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
     adapters.serviceStore.servicesByStaffId.mockResolvedValue([
-      { name: 'eRp' } as ServiceEntity,
-      { name: 'STar gaZiNG' } as ServiceEntity
+      { name: 'eRp', price: new Decimal(15.96) } as ServiceEntity,
+      { name: 'STar gaZiNG', price: new Decimal(25.56) } as ServiceEntity
     ] as ServiceEntity[]);
     adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValue(
       0

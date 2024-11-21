@@ -13,6 +13,7 @@ import { NotFoundException } from '@exceptions/not-found.exception';
 import { BadRequestException } from '@exceptions/bad-request.exception';
 import moment from 'moment-timezone';
 import { ServiceEntity } from '@models/service/service.model';
+import Decimal from 'decimal.js';
 
 export class ReservationService implements IReservationService {
   constructor(
@@ -100,6 +101,10 @@ export class ReservationService implements IReservationService {
     );
 
     await this.adapters.txProvider?.runInTransaction(async (adapters) => {
+      const priceSum = matchedServices.reduce(
+        (acc, curr) => acc.add(curr.price),
+        new Decimal(0)
+      );
       const reservation = await adapters.reservationStore.save({
         staff_id: staff.staff_id,
         name: r.name.trim(),
@@ -108,7 +113,7 @@ export class ReservationService implements IReservationService {
         address: r.address?.trim() || null,
         phone: r.phone?.trim() || null,
         image_key: null,
-        price: '', // TODO add all prices using big decimal library
+        price: priceSum,
         status: ReservationEnum.PENDING,
         created_at: this.logger.date(),
         scheduled_for: start.toDate(),

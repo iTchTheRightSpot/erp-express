@@ -6,6 +6,7 @@ import {
   MaxLength,
   MinLength
 } from 'class-validator';
+import Decimal from 'decimal.js';
 
 export enum ReservationEnum {
   PENDING = 'PENDING',
@@ -22,7 +23,7 @@ export interface ReservationEntity {
   address: string;
   phone: string | null;
   image_key: string | null;
-  price: string;
+  price: Decimal;
   status: ReservationEnum;
   created_at: Date;
   scheduled_for: Date;

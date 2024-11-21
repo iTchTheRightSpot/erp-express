@@ -30,7 +30,7 @@ export class ReservationStore implements IReservationStore {
           o.address?.trim() || null,
           o.phone?.trim() || null,
           o.image_key?.trim() || null,
-          o.price.trim(),
+          o.price.toFixed(2),
           o.status,
           o.created_at,
           o.scheduled_for,

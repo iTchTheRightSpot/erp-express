@@ -12,6 +12,7 @@ import {
 } from '@stores/staff/staff.interface.store';
 import { StaffStore } from '@stores/staff/staff.store';
 import { StaffServiceStore } from '@stores/staff/staff-service.store';
+import Decimal from 'decimal.js';
 
 describe('service store', () => {
   let pool: Pool;
@@ -43,13 +44,14 @@ describe('service store', () => {
     // method to test
     const save = await serviceStore.save({
       name: 'service',
-      price: '180.17',
+      price: new Decimal(180.17),
       duration: 3600,
       clean_up_time: 30 * 60
     } as ServiceEntity);
 
     // assert
     expect(Number(save.service_id)).toBeGreaterThan(0);
+    expect(save.price.toString()).toEqual('180.17');
 
     // method to test
     const find = await serviceStore.serviceByName('service');
@@ -65,7 +67,7 @@ describe('service store', () => {
     const staff = await staffStore.save({} as StaffEntity);
     const erp = await serviceStore.save({
       name: 'erp',
-      price: '45.69',
+      price: new Decimal(45.69),
       duration: 3600,
       clean_up_time: 30 * 60
     } as ServiceEntity);

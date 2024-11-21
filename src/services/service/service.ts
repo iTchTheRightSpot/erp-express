@@ -4,6 +4,7 @@ import { Adapters } from '@stores/adapters';
 import { ICache } from '@utils/cache';
 import { ServiceEntity, ServicePayload } from '@models/service/service.model';
 import { InsertionException } from '@exceptions/insertion.exception';
+import Decimal from 'decimal.js';
 
 export class ServiceImpl implements IService {
   constructor(
@@ -16,7 +17,7 @@ export class ServiceImpl implements IService {
     try {
       await this.adapters.serviceStore.save({
         name: p.name,
-        price: p.price.trim(),
+        price: new Decimal(p.price.trim()),
         is_visible: p.is_visible,
         duration: p.duration,
         clean_up_time: p.clean_up_time

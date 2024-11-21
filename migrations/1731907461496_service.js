@@ -19,7 +19,7 @@ exports.up = (pgm) => {
         unique: true
       },
       name: { type: 'varchar(50)', notNull: true, unique: true },
-      price: { type: 'decimal(50)', notNull: true },
+      price: { type: 'decimal(6, 2)', notNull: true },
       is_visible: { type: 'bool', notNull: true, default: false },
       duration: { type: 'integer', notNull: true },
       clean_up_time: { type: 'integer', notNull: true }

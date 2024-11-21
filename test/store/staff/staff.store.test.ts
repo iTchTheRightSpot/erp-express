@@ -15,6 +15,7 @@ import { IServiceStore } from '@stores/service/service.interface.store';
 import { ServiceStore } from '@stores/service/service.store';
 import { StaffServiceStore } from '@stores/staff/staff-service.store';
 import { ServiceEntity } from '@models/service/service.model';
+import Decimal from 'decimal.js';
 
 describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
   let pool: Pool;
@@ -76,7 +77,7 @@ describe(`${StaffStore.name} and ${StaffServiceStore.name}`, () => {
       const staff = await staffStore.save({} as StaffEntity);
       const erp = await serviceStore.save({
         name: 'erp',
-        price: '45.69',
+        price: new Decimal(45.69),
         duration: 3600,
         clean_up_time: 30 * 60
       } as ServiceEntity);

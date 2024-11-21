@@ -1,9 +1,10 @@
 import { IsDefined, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import Decimal from 'decimal.js';
 
 export interface ServiceEntity {
   service_id: string;
   name: string;
-  price: string;
+  price: Decimal;
   is_visible: boolean;
   duration: number;
   clean_up_time: number;
