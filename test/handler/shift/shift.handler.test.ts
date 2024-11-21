@@ -150,7 +150,9 @@ describe('shift handler', () => {
 
       // assert
       expect(res.status).toEqual(400);
-      expect(res.body.message).toContain('plus duration cannot include the next day')
+      expect(res.body.message).toContain(
+        'plus duration cannot include the next day'
+      );
     });
   });
 
