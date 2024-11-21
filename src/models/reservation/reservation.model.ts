@@ -36,6 +36,19 @@ export interface ServiceReservationEntity {
   service_id: string;
 }
 
+export interface AvailableTimesPayload {
+  services: string[];
+  staff_id: string;
+  month: number;
+  year: number;
+  timezone: string;
+}
+
+export interface AvailableTimesResponse {
+  date: number;
+  times: number[];
+}
+
 export class ReservationPayload {
   @IsDefined({ message: 'staff_id has to be defined' })
   @IsNotEmpty({ message: 'staff_id cannot be empty' })

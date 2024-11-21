@@ -20,7 +20,6 @@ describe('reservation handler', () => {
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
   let staff: StaffEntity;
-  let erp: ServiceEntity;
 
   beforeAll(async () => {
     pool = poolInstance();
@@ -35,7 +34,13 @@ describe('reservation handler', () => {
   beforeEach(async () => {
     await client.query('BEGIN');
     staff = await adapters.staffStore.save({} as StaffEntity);
-    erp = await adapters.serviceStore.save({
+  });
+
+  afterEach(async () => await client.query('ROLLBACK'));
+
+  it('should create a reservation', async () => {
+    // pre-save
+    const erp = await adapters.serviceStore.save({
       name: 'erp',
       price: new Decimal(65.44),
       duration: 3600,
@@ -45,11 +50,7 @@ describe('reservation handler', () => {
       staff_id: staff.staff_id,
       service_id: erp.service_id
     } as StaffServiceEntity);
-  });
 
-  afterEach(async () => await client.query('ROLLBACK'));
-
-  it('should create a reservation', async () => {
     // given
     const body = {
       staff_id: staff.uuid,
@@ -68,5 +69,35 @@ describe('reservation handler', () => {
 
     // assert
     expect(res.status).toEqual(201);
+  });
+
+  describe('flow of creating an appointment', () => {
+    it('should retrieve all available appointment for staff. 1 service as a param', async () => {
+      const timezone = 'America/Toronto';
+
+      // route to test
+      const res = await request(app)
+        .get(
+          `${env.ROUTE_PREFIX}reservation?staff_id=${staff.uuid}&services=erp&month=1&year=2024&timezone=${timezone}`
+        )
+        .set('Content-Type', 'application/json');
+
+      // assert
+      expect(res.status).toEqual(200);
+    });
+
+    it('should retrieve all available appointment for staff. multiple services as a param', async () => {
+      const timezone = 'America/Toronto';
+
+      // route to test
+      const res = await request(app)
+        .get(
+          `${env.ROUTE_PREFIX}reservation?staff_id=${staff.uuid}&services=erp&services=accounting&month=1&year=2024&timezone=${timezone}`
+        )
+        .set('Content-Type', 'application/json');
+
+      // assert
+      expect(res.status).toEqual(200);
+    });
   });
 });

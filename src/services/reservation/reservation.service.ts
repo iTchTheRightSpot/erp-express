@@ -3,6 +3,8 @@ import { ILogger } from '@utils/log';
 import { Adapters } from '@stores/adapters';
 import { ICache } from '@utils/cache';
 import {
+  AvailableTimesPayload,
+  AvailableTimesResponse,
   ReservationEntity,
   ReservationEnum,
   ReservationPayload,
@@ -129,5 +131,11 @@ export class ReservationService implements IReservationService {
 
     await this.mailService.sendAppointmentCreation();
     this.cache.clear();
+  }
+
+  async staffAvailability(
+    o: AvailableTimesPayload
+  ): Promise<AvailableTimesResponse[]> {
+    return Promise.resolve([]);
   }
 }
