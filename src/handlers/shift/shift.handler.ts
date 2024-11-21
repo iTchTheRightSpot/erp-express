@@ -8,7 +8,7 @@ import {
 import { ILogger } from '@utils/log';
 import { IShiftService } from '@services/shift/shift.interface.service';
 import { middleware } from '@middlewares/middleware';
-import { ShiftPayload } from '@models/shift/shift.model';
+import { AllShiftsPayload, ShiftPayload } from '@models/shift/shift.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import { isInvalidateMonthYear, resolveTimezone } from '@handlers/util.handler';
 
@@ -56,13 +56,14 @@ export class ShiftHandler {
         timezone,
         this.logger.timezone()
       );
+      const payload: AllShiftsPayload = {
+        staffUUID: staffId || req.jwtClaim!.obj.user_id,
+        month: obj.month,
+        year: obj.year,
+        timezone: resolvedTimezone.trim()
+      };
 
-      const list = await this.service.shifts(
-        staffId || req.jwtClaim!.obj.user_id,
-        obj.month,
-        obj.year,
-        resolvedTimezone.trim()
-      );
+      const list = await this.service.shifts(payload);
 
       res.setHeader('Content-Type', 'application/json').status(200).send(list);
     } catch (e) {

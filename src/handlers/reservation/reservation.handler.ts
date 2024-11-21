@@ -49,7 +49,9 @@ export class ReservationHandler {
     const staffId = staff_id as string | undefined;
 
     try {
+      // TODO month & year cannot be in the past
       const obj = isInvalidateMonthYear(month, year);
+
       const resolvedTimezone = resolveTimezone(
         timezone,
         this.logger.timezone()

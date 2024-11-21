@@ -162,6 +162,24 @@ export class ReservationService implements IReservationService {
       staff.staff_id
     );
     const matchedServices = this.matchStaffServices(o.services, services);
+    const durationSum = matchedServices.reduce(
+      (acc, cur) => acc + (cur.duration + cur.clean_up_time),
+      0
+    );
+    const start = 1;
+    const end = 1;
+
+    // 0. convert the month & year to request timezone
+    // 1. sum up the service duration & clean up time
+    // 2. find said staffs working hrs (parallel work).
+    // 2i. in the query, make sure the difference between
+    // working hrs is greater than sum (point 1). use
+    // DATEDIFF sql function.
+    // 3. in parallel, generate chunks of reservation times
+    // based on each shift.
+    // 4. in parallel filter times that contain in reservation
+    // table with statuses PENDING, CONFIRMED
+    // 5. transform to unix and respond.
 
     return Promise.resolve([]);
   }

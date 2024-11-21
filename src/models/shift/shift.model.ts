@@ -25,6 +25,13 @@ export interface IShiftResponse {
   end: number;
 }
 
+export interface AllShiftsPayload {
+  staffUUID: string;
+  month: number;
+  year: number;
+  timezone: string;
+}
+
 export interface ISchedulePeriod {
   isVisible: boolean;
   isReoccurring: boolean;
