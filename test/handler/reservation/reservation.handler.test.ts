@@ -50,8 +50,6 @@ describe('reservation handler', () => {
   afterEach(async () => await client.query('ROLLBACK'));
 
   it('should create a reservation', async () => {
-    // pre-save
-
     // given
     const body = {
       staff_id: staff.uuid,

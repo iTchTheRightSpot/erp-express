@@ -10,7 +10,7 @@ export interface ILogger {
   critical(...args: any[]): Promise<void>;
 }
 
-export class LoggerImpl implements ILogger {
+export class ProductionLogger implements ILogger {
   private readonly momentTimeZone: moment.Moment;
 
   constructor(

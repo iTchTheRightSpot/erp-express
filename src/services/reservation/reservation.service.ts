@@ -146,7 +146,7 @@ export class ReservationService implements IReservationService {
   }
 
   private readonly createKey = (o: AvailableTimesPayload) =>
-    `${o.services.join('_ ')}_${o.staff_id}_${o.month}_${o.year}_${o.timezone}`;
+    `${o.services.join('_')}_${o.staff_id}_${o.month}_${o.year}_${o.timezone}`;
 
   async reservationAvailability(
     o: AvailableTimesPayload
