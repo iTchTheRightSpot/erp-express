@@ -26,7 +26,7 @@ exports.up = (pgm) => {
       address: { type: 'VARCHAR(255)', notNull: false, unique: false },
       phone: { type: 'VARCHAR(20)', notNull: false, unique: false },
       image_key: { type: 'VARCHAR(37)', notNull: false, unique: false },
-      amount_quote: { type: 'DECIMAL(6, 2)', notNull: true, unique: false },
+      price: { type: 'DECIMAL(6, 2)', notNull: true, unique: false },
       status: { type: 'reservationenum', notNull: true, default: 'PENDING' },
       created_at: { type: 'TIMESTAMP', notNull: true, unique: false },
       scheduled_for: { type: 'TIMESTAMP', notNull: true, unique: false },

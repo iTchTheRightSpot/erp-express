@@ -22,7 +22,7 @@ export interface ReservationEntity {
   address: string;
   phone: string | null;
   image_key: string | null;
-  amount_quote: string;
+  price: string;
   status: ReservationEnum;
   created_at: Date;
   scheduled_for: Date;
