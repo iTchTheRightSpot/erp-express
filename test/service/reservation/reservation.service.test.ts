@@ -170,7 +170,10 @@ describe('reservation service', () => {
       // given
       const dto = {
         staff_id: 'staff-uuid',
-        services: ['erp', 'star gazing']
+        services: ['erp', 'star gazing'],
+        start: new Date(),
+        end: new Date(),
+        timezone: 'UTC'
       } as AvailableTimesPayload;
 
       // when
@@ -191,7 +194,10 @@ describe('reservation service', () => {
         // given
         const dto = {
           staff_id: 'staff-uuid',
-          services: ['erp', 'star gazing']
+          services: ['erp', 'star gazing'],
+          start: new Date(),
+          end: new Date(),
+          timezone: 'UTC'
         } as AvailableTimesPayload;
 
         // when
@@ -210,11 +216,14 @@ describe('reservation service', () => {
         );
       });
 
-      it(`staff does not offer one or more of the services`, async () => {
+      it('staff does not offer one or more of the services', async () => {
         // given
         const dto = {
           staff_id: 'staff-uuid',
-          services: ['erp', 'star gazing']
+          services: ['erp', 'star gazing'],
+          start: new Date(),
+          end: new Date(),
+          timezone: 'UTC'
         } as AvailableTimesPayload;
 
         // when

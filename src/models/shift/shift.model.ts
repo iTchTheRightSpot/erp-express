@@ -113,6 +113,15 @@ export class ShiftPayload {
           `${JSON.stringify(this.times[i].start)} and duration ${JSON.stringify(this.times[i].duration)} overlap with an existing time period`
         );
 
+      if (
+        start.getDate() !== end.getDate() ||
+        start.getMonth() !== end.getMonth() ||
+        start.getFullYear() !== end.getFullYear()
+      )
+        throw new BadRequestException(
+          `${this.times[i].start} plus duration cannot include the next day`
+        );
+
       result.times[i] = {
         isVisible: this.times[i].is_visible,
         isReoccurring: this.times[i].is_reoccurring,

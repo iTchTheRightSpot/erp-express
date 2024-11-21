@@ -58,4 +58,20 @@ describe('shift model', () => {
       expect(err.message).toContain('has to be in ISO format (ISO 8601)');
     }
   });
+
+  it(`should throw ${BadRequestException.name} working hrs bleeds into the following day`, () => {
+    const d = new Date();
+    d.setHours(23);
+    const str = d.toISOString();
+    payload.times = [validShiftSegment(str, 3600 * 2)];
+
+    try {
+      payload.checkForOverLappingSegments(new Date(), 'UTC');
+    } catch (e) {
+      const err = e as BadRequestException;
+      expect(err.message).toContain(
+        'plus duration cannot include the next day'
+      );
+    }
+  });
 });

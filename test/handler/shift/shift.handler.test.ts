@@ -58,68 +58,99 @@ describe('shift handler', () => {
     await pool.end();
   });
 
-  it('should create a shift for staff', async () => {
-    const date = logger.date();
-    date.setSeconds(date.getSeconds() + 24 * 60 * 60);
+  describe('creating a staffs working hrs', () => {
+    it('successful creation', async () => {
+      const date = logger.date();
+      date.setSeconds(date.getSeconds() + 24 * 60 * 60);
 
-    // given
-    const body = {
-      staff_id: staff.uuid,
-      times: [
-        {
-          is_visible: true,
-          is_reoccurring: true,
-          start: date.toISOString(),
-          duration: 3600
-        }
-      ]
-    };
+      // given
+      const body = {
+        staff_id: staff.uuid,
+        times: [
+          {
+            is_visible: true,
+            is_reoccurring: true,
+            start: date.toISOString(),
+            duration: 3600
+          }
+        ]
+      };
 
-    // route to test
-    const res = await request(app)
-      .post(`${env.ROUTE_PREFIX}shift`)
-      .send(body)
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
-      .set('Cookie', [`${env.COOKIENAME}=${token}`]);
+      // route to test
+      const res = await request(app)
+        .post(`${env.ROUTE_PREFIX}shift`)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Cookie', [`${env.COOKIENAME}=${token}`]);
 
-    // assert
-    expect(res.status).toEqual(201);
-  });
+      // assert
+      expect(res.status).toEqual(201);
+    });
 
-  it('should reject shift creation conflict', async () => {
-    // given
-    const end = new Date();
-    end.setSeconds(end.getSeconds() + 60);
+    it('reject creation conflict', async () => {
+      // given
+      const end = new Date();
+      end.setSeconds(end.getSeconds() + 60);
 
-    await adapters.shiftStore.save({
-      staff_id: staff.staff_id,
-      shift_start: new Date(),
-      shift_end: end
-    } as ShiftEntity);
+      await adapters.shiftStore.save({
+        staff_id: staff.staff_id,
+        shift_start: new Date(),
+        shift_end: end
+      } as ShiftEntity);
 
-    const body = {
-      staff_id: staff.uuid,
-      times: [
-        {
-          is_visible: true,
-          is_reoccurring: true,
-          start: new Date().toISOString(),
-          duration: 3600
-        }
-      ]
-    };
+      const body = {
+        staff_id: staff.uuid,
+        times: [
+          {
+            is_visible: true,
+            is_reoccurring: true,
+            start: new Date().toISOString(),
+            duration: 3600
+          }
+        ]
+      };
 
-    // route to test
-    const res = await request(app)
-      .post(`${env.ROUTE_PREFIX}shift`)
-      .send(body)
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
-      .set('Cookie', [`${env.COOKIENAME}=${token}`]);
+      // route to test
+      const res = await request(app)
+        .post(`${env.ROUTE_PREFIX}shift`)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Cookie', [`${env.COOKIENAME}=${token}`]);
 
-    // assert
-    expect(res.status).toEqual(400);
+      // assert
+      expect(res.status).toEqual(400);
+    });
+
+    it('reject creation shift bleeds into the following day', async () => {
+      // given
+      const start = new Date();
+      start.setHours(23);
+
+      const body = {
+        staff_id: staff.uuid,
+        times: [
+          {
+            is_visible: true,
+            is_reoccurring: true,
+            start: start,
+            duration: 3600 * 2
+          }
+        ]
+      };
+
+      // route to test
+      const res = await request(app)
+        .post(`${env.ROUTE_PREFIX}shift`)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json')
+        .set('Cookie', [`${env.COOKIENAME}=${token}`]);
+
+      // assert
+      expect(res.status).toEqual(400);
+    });
   });
 
   describe('shift in range request', () => {
