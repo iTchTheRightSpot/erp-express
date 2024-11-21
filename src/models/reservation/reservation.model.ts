@@ -39,8 +39,8 @@ export interface ServiceReservationEntity {
 export interface AvailableTimesPayload {
   services: string[];
   staff_id: string;
-  month: number;
-  year: number;
+  start: Date;
+  end: Date;
   timezone: string;
 }
 

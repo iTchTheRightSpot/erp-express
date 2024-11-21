@@ -16,6 +16,7 @@ import { BadRequestException } from '@exceptions/bad-request.exception';
 import moment from 'moment-timezone';
 import { ServiceEntity } from '@models/service/service.model';
 import Decimal from 'decimal.js';
+import { ShiftEntity } from '@models/shift/shift.model';
 
 export class ReservationService implements IReservationService {
   constructor(
@@ -146,7 +147,28 @@ export class ReservationService implements IReservationService {
   }
 
   private readonly createKey = (o: AvailableTimesPayload) =>
-    `${o.services.join('_')}_${o.staff_id}_${o.month}_${o.year}_${o.timezone}`;
+    `${o.services.join('_')}_${o.staff_id}_${o.start.getMonth()}_${o.start.getFullYear()}_${o.timezone}`;
+
+  private readonly generateChunks = async (
+    shifts: ShiftEntity[],
+    seconds: number
+  ) => {
+    return await Promise.all(
+      shifts.map(async (shift) => {
+        const times: Date[] = [];
+
+        let tempStart = new Date(shift.shift_start);
+        const tempEnd = new Date(shift.shift_end);
+
+        while (tempStart <= tempEnd) {
+          times.push(new Date(tempStart));
+          tempStart.setSeconds(tempStart.getSeconds() + seconds);
+        }
+
+        return { start: shift.shift_start, times };
+      })
+    );
+  };
 
   async reservationAvailability(
     o: AvailableTimesPayload
@@ -162,21 +184,28 @@ export class ReservationService implements IReservationService {
       staff.staff_id
     );
     const matchedServices = this.matchStaffServices(o.services, services);
+
+    // 1. sum up the service duration & clean up time
     const durationSum = matchedServices.reduce(
       (acc, cur) => acc + (cur.duration + cur.clean_up_time),
       0
     );
-    const start = 1;
-    const end = 1;
 
-    // 0. convert the month & year to request timezone
-    // 1. sum up the service duration & clean up time
-    // 2. find said staffs working hrs (parallel work).
+    // 2. find said staffs working hrs.
     // 2i. in the query, make sure the difference between
     // working hrs is greater than sum (point 1). use
     // DATEDIFF sql function.
+    const shifts = await this.adapters.shiftStore.shiftsInRangeWithDifference(
+      staff.staff_id,
+      o.start,
+      o.end,
+      durationSum
+    );
+
     // 3. in parallel, generate chunks of reservation times
     // based on each shift.
+    const chunks = this.generateChunks(shifts, durationSum);
+
     // 4. in parallel filter times that contain in reservation
     // table with statuses PENDING, CONFIRMED
     // 5. transform to unix and respond.

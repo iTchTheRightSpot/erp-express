@@ -91,4 +91,13 @@ export class ShiftStore implements IShiftStore {
       }
     });
   }
+
+  shiftsInRangeWithDifference(
+    staffId: string,
+    start: Date,
+    end: Date,
+    seconds: number
+  ): Promise<ShiftEntity[]> {
+    return Promise.resolve([]);
+  }
 }

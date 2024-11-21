@@ -13,6 +13,7 @@ import {
   ReservationPayload
 } from '@models/reservation/reservation.model';
 import { isInvalidateMonthYear, resolveTimezone } from '@handlers/util.handler';
+import moment from 'moment-timezone';
 
 export class ReservationHandler {
   constructor(
@@ -51,17 +52,22 @@ export class ReservationHandler {
     try {
       // TODO month & year cannot be in the past
       const obj = isInvalidateMonthYear(month, year);
-
       const resolvedTimezone = resolveTimezone(
         timezone,
         this.logger.timezone()
       );
 
+      const date = this.logger.date();
+      date.setMonth(obj.month - 1);
+      date.setFullYear(obj.year);
+      const startInTimezone = moment(date).tz(resolvedTimezone);
+      const lastDateOfMonth = startInTimezone.clone().endOf('month');
+
       const payload: AvailableTimesPayload = {
         services: this.services(services),
         staff_id: staffId || '',
-        month: obj.month,
-        year: obj.year,
+        start: startInTimezone.toDate(),
+        end: lastDateOfMonth.toDate(),
         timezone: resolvedTimezone
       };
       const arr = await this.service.reservationAvailability(payload);

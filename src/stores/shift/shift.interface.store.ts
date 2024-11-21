@@ -8,4 +8,10 @@ export interface IShiftStore {
     start: Date,
     end: Date
   ): Promise<ShiftEntity[]>;
+  shiftsInRangeWithDifference(
+    staffId: string,
+    start: Date,
+    end: Date,
+    seconds: number
+  ): Promise<ShiftEntity[]>;
 }
