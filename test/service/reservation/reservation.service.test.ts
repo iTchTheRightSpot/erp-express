@@ -3,6 +3,7 @@ import { ReservationService } from '@services/reservation/reservation.service';
 import { DevelopmentLogger } from '@utils/log';
 import { NotFoundException } from '@exceptions/not-found.exception';
 import {
+  AvailableTimesPayload,
   ReservationEntity,
   ReservationEnum,
   ReservationPayload,
@@ -34,7 +35,7 @@ describe('reservation service', () => {
     mailService = {
       sendAppointmentCreation: jest.fn()
     };
-    cache = { clear: jest.fn() };
+    cache = { get: jest.fn(), clear: jest.fn() };
     service = new ReservationService(
       new DevelopmentLogger(),
       adapters,
@@ -74,7 +75,7 @@ describe('reservation service', () => {
         // method to test & assert
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(
-          'no matching service(s) found for the selected staff'
+          'The following services were not found for the selected staff: erp, star gazing. Please check your input and try again'
         );
       });
 
@@ -95,7 +96,7 @@ describe('reservation service', () => {
         // method to test & assert
         await expect(service.create(dto)).rejects.toThrow(BadRequestException);
         await expect(service.create(dto)).rejects.toThrow(
-          'no matching service(s) found for the selected staff'
+          'The following services were not found for the selected staff: star gazing. Please check your input and try again'
         );
       });
     });
@@ -164,5 +165,73 @@ describe('reservation service', () => {
     });
   });
 
-  describe('retrieving a staffs availability', () => {});
+  describe('retrieving a staffs availability', () => {
+    it(`should throw ${NotFoundException.name} staff does not exist`, async () => {
+      // given
+      const dto = {
+        staff_id: 'staff-uuid',
+        services: ['erp', 'star gazing']
+      } as AvailableTimesPayload;
+
+      // when
+      cache.get.mockReturnValue(undefined);
+      adapters.staffStore.staffByUUID.mockResolvedValue(undefined);
+
+      // method to test & assert
+      await expect(service.reservationAvailability(dto)).rejects.toThrow(
+        NotFoundException
+      );
+      await expect(service.reservationAvailability(dto)).rejects.toThrow(
+        'invalid staff id'
+      );
+    });
+
+    describe(`should throw ${BadRequestException.name} staff does not offer service`, () => {
+      it('staff does not offer any service', async () => {
+        // given
+        const dto = {
+          staff_id: 'staff-uuid',
+          services: ['erp', 'star gazing']
+        } as AvailableTimesPayload;
+
+        // when
+        cache.get.mockReturnValue(undefined);
+        adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
+        adapters.serviceStore.servicesByStaffId.mockResolvedValue(
+          [] as ServiceEntity[]
+        );
+
+        // method to test & assert
+        await expect(service.reservationAvailability(dto)).rejects.toThrow(
+          BadRequestException
+        );
+        await expect(service.reservationAvailability(dto)).rejects.toThrow(
+          'The following services were not found for the selected staff: erp, star gazing. Please check your input and try again'
+        );
+      });
+
+      it(`staff does not offer one or more of the services`, async () => {
+        // given
+        const dto = {
+          staff_id: 'staff-uuid',
+          services: ['erp', 'star gazing']
+        } as AvailableTimesPayload;
+
+        // when
+        cache.get.mockReturnValue(undefined);
+        adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
+        adapters.serviceStore.servicesByStaffId.mockResolvedValue([
+          { name: 'rolly' } as ServiceEntity
+        ] as ServiceEntity[]);
+
+        // method to test & assert
+        await expect(service.reservationAvailability(dto)).rejects.toThrow(
+          BadRequestException
+        );
+        await expect(service.reservationAvailability(dto)).rejects.toThrow(
+          'The following services were not found for the selected staff: erp, star gazing. Please check your input and try again'
+        );
+      });
+    });
+  });
 });

@@ -22,7 +22,7 @@ export class ReservationService implements IReservationService {
     private readonly logger: ILogger,
     private readonly adapters: Adapters,
     private readonly mailService: IMailService,
-    private readonly cache: ICache<string, {}>
+    private readonly cache: ICache<string, AvailableTimesResponse[]>
   ) {}
 
   private readonly matchStaffServices = (
@@ -37,8 +37,17 @@ export class ReservationService implements IReservationService {
       .filter((service): service is ServiceEntity => !!service);
 
     if (matchedServices.length !== requestedServices.length) {
+      const unmatchedServices = requestedServices.filter(
+        (r) =>
+          !availableServices.some(
+            (s) => s.name.toLowerCase().trim() === r.toLowerCase().trim()
+          )
+      );
+
       throw new BadRequestException(
-        'no matching service(s) found for the selected staff'
+        `The following services were not found for the selected staff: ${unmatchedServices.join(
+          ', '
+        )}. Please check your input and try again`
       );
     }
 
@@ -91,7 +100,10 @@ export class ReservationService implements IReservationService {
       r.timezone,
       this.logger.timezone()
     );
-    const durationSum = matchedServices.reduce((sum, s) => sum + s.duration, 0);
+    const durationSum = matchedServices.reduce(
+      (sum, s) => sum + (s.duration + s.clean_up_time),
+      0
+    );
     const end = start.clone().add(durationSum, 'seconds');
 
     await this.checkReservationConflicts(
@@ -133,9 +145,24 @@ export class ReservationService implements IReservationService {
     this.cache.clear();
   }
 
-  async staffAvailability(
+  private readonly createKey = (o: AvailableTimesPayload) =>
+    `${o.services.join('_ ')}_${o.staff_id}_${o.month}_${o.year}_${o.timezone}`;
+
+  async reservationAvailability(
     o: AvailableTimesPayload
   ): Promise<AvailableTimesResponse[]> {
+    const key = this.createKey(o);
+    const val = this.cache.get(key);
+    if (val !== undefined) return val;
+
+    const staff = await this.adapters.staffStore.staffByUUID(o.staff_id.trim());
+    if (!staff) throw new NotFoundException('invalid staff id');
+
+    const services = await this.adapters.serviceStore.servicesByStaffId(
+      staff.staff_id
+    );
+    const matchedServices = this.matchStaffServices(o.services, services);
+
     return Promise.resolve([]);
   }
 }

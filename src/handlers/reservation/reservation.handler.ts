@@ -29,7 +29,7 @@ export class ReservationHandler {
       middleware.requestBody(this.logger, ReservationPayload),
       this.create
     );
-    this.router.get('/reservation', this.availableTimes);
+    this.router.get('/reservation', this.reservationAvailability);
   };
 
   private services(services: any): string[] {
@@ -39,7 +39,7 @@ export class ReservationHandler {
     return [];
   }
 
-  private readonly availableTimes = async (
+  private readonly reservationAvailability = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -62,7 +62,7 @@ export class ReservationHandler {
         year: obj.year,
         timezone: resolvedTimezone
       };
-      const arr = await this.service.staffAvailability(payload);
+      const arr = await this.service.reservationAvailability(payload);
       res.status(200).send(arr);
     } catch (e) {
       next(e);

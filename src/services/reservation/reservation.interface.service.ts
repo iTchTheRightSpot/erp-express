@@ -6,7 +6,7 @@ import {
 
 export interface IReservationService {
   create(r: ReservationPayload): Promise<void>;
-  staffAvailability(
+  reservationAvailability(
     o: AvailableTimesPayload
   ): Promise<AvailableTimesResponse[]>;
 }

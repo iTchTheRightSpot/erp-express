@@ -20,6 +20,7 @@ describe('reservation handler', () => {
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
   let staff: StaffEntity;
+  let erp: ServiceEntity;
 
   beforeAll(async () => {
     pool = poolInstance();
@@ -34,13 +35,7 @@ describe('reservation handler', () => {
   beforeEach(async () => {
     await client.query('BEGIN');
     staff = await adapters.staffStore.save({} as StaffEntity);
-  });
-
-  afterEach(async () => await client.query('ROLLBACK'));
-
-  it('should create a reservation', async () => {
-    // pre-save
-    const erp = await adapters.serviceStore.save({
+    erp = await adapters.serviceStore.save({
       name: 'erp',
       price: new Decimal(65.44),
       duration: 3600,
@@ -50,6 +45,12 @@ describe('reservation handler', () => {
       staff_id: staff.staff_id,
       service_id: erp.service_id
     } as StaffServiceEntity);
+  });
+
+  afterEach(async () => await client.query('ROLLBACK'));
+
+  it('should create a reservation', async () => {
+    // pre-save
 
     // given
     const body = {
@@ -87,6 +88,16 @@ describe('reservation handler', () => {
     });
 
     it('should retrieve all available appointment for staff. multiple services as a param', async () => {
+      const accounting = await adapters.serviceStore.save({
+        name: 'accounting',
+        price: new Decimal(65.44),
+        duration: 3600,
+        clean_up_time: 60 * 30
+      } as ServiceEntity);
+      await adapters.staffServiceStore.save({
+        staff_id: staff.staff_id,
+        service_id: accounting.service_id
+      } as StaffServiceEntity);
       const timezone = 'America/Toronto';
 
       // route to test
