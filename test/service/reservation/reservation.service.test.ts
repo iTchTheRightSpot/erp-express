@@ -14,6 +14,7 @@ import { StaffEntity } from '@models/staff/staff.model';
 import { ServiceEntity } from '@models/service/service.model';
 import moment from 'moment-timezone';
 import Decimal from 'decimal.js';
+import { InsertionException } from '@exceptions/insertion.exception';
 
 describe('reservation service', () => {
   let service: IReservationService;
@@ -25,6 +26,7 @@ describe('reservation service', () => {
     adapters = {
       staffStore: { staffByUUID: jest.fn() },
       serviceStore: { servicesByStaffId: jest.fn() },
+      shiftStore: { countShiftsInRangeAndVisibility: jest.fn() },
       reservationStore: {
         countReservationsForStaffByTimeAndStatuses: jest.fn(),
         save: jest.fn()
@@ -101,6 +103,27 @@ describe('reservation service', () => {
       });
     });
 
+    it(`should throw ${BadRequestException.name} reservation does not match staffs working hrs`, async () => {
+      // given
+      const dto = {
+        staff_id: 'staff-uuid',
+        services: ['erp']
+      } as ReservationPayload;
+
+      // when
+      adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
+      adapters.serviceStore.servicesByStaffId.mockResolvedValue([
+        { name: 'erp' } as ServiceEntity
+      ] as ServiceEntity[]);
+      adapters.shiftStore.countShiftsInRangeAndVisibility.mockResolvedValue(0);
+
+      // method to test & assert
+      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(
+        'invalid reservation time'
+      );
+    });
+
     it(`should throw ${BadRequestException.name} reservation that overlaps with a ${ReservationEnum.PENDING} or ${ReservationEnum.CONFIRMED} appointment`, async () => {
       // given
       const dto = {
@@ -115,6 +138,7 @@ describe('reservation service', () => {
         { name: 'erp' } as ServiceEntity,
         { name: 'star gazing' } as ServiceEntity
       ] as ServiceEntity[]);
+      adapters.shiftStore.countShiftsInRangeAndVisibility.mockResolvedValue(1);
       adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValue(
         3
       );
@@ -124,6 +148,46 @@ describe('reservation service', () => {
       await expect(service.create(dto)).rejects.toThrow(
         `reservation creation failed: appointment conflicts with a ${ReservationEnum.PENDING} or ${ReservationEnum.CONFIRMED} appointment`
       );
+    });
+
+    it(`should throw ${InsertionException.name}. final check to prevent over booking`, async () => {
+      // given
+      const dto = {
+        staff_id: 'staff-uuid',
+        name: 'erp',
+        email: 'erp@email.com',
+        services: ['erp', 'star gazing'],
+        timezone: 'America/Toronto',
+        time: new Date().getTime()
+      } as ReservationPayload;
+
+      // when
+      adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
+      adapters.serviceStore.servicesByStaffId.mockResolvedValue([
+        { name: 'eRp', price: new Decimal(15.96) } as ServiceEntity,
+        { name: 'STar gaZiNG', price: new Decimal(25.56) } as ServiceEntity
+      ] as ServiceEntity[]);
+      adapters.shiftStore.countShiftsInRangeAndVisibility.mockResolvedValue(1);
+      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValueOnce(
+        0
+      );
+      adapters.txProvider.runInTransaction.mockImplementation(
+        async (callback: any) => {
+          await callback(adapters);
+        }
+      );
+      adapters.reservationStore.save.mockResolvedValue({
+        reservation_id: '1'
+      } as ReservationEntity);
+      adapters.serviceReservationStore.save.mockResolvedValue(
+        {} as ServiceReservationEntity
+      );
+      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValueOnce(
+        2
+      );
+
+      // method to test
+      await expect(service.create(dto)).rejects.toThrow(InsertionException);
     });
 
     it('success creating an appointment', async () => {
@@ -143,7 +207,8 @@ describe('reservation service', () => {
         { name: 'eRp', price: new Decimal(15.96) } as ServiceEntity,
         { name: 'STar gaZiNG', price: new Decimal(25.56) } as ServiceEntity
       ] as ServiceEntity[]);
-      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValue(
+      adapters.shiftStore.countShiftsInRangeAndVisibility.mockResolvedValue(1);
+      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValueOnce(
         0
       );
       adapters.txProvider.runInTransaction.mockImplementation(
@@ -152,6 +217,9 @@ describe('reservation service', () => {
       adapters.reservationStore.save.mockResolvedValue({} as ReservationEntity);
       adapters.serviceReservationStore.save.mockResolvedValue(
         {} as ServiceReservationEntity
+      );
+      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValueOnce(
+        1
       );
 
       // method to test

@@ -50,7 +50,7 @@ export class ShiftStore implements IShiftStore {
         const res = await this.db.exec(q, staffId, start, end);
         const row = res.rows[0];
         if (!row) {
-          reject(-1);
+          resolve(0);
           return;
         }
         resolve(Number(row.count));
@@ -98,6 +98,62 @@ export class ShiftStore implements IShiftStore {
     end: Date,
     seconds: number
   ): Promise<ShiftEntity[]> {
-    return Promise.resolve([]);
+    const q = `
+      SELECT * FROM shift s
+      WHERE s.staff_id = $1
+      AND (
+          (s.shift_start BETWEEN $2 AND $3) OR
+          (s.shift_end BETWEEN $2 AND $3)
+      )
+      AND EXTRACT(EPOCH FROM (s.shift_end - s.shift_start)) >= $4
+    `;
+
+    return new Promise<ShiftEntity[]>(async (resolve, reject) => {
+      try {
+        const result = await this.db.exec(q, staffId, start, end, seconds);
+
+        if (!result.rows) {
+          resolve([] as ShiftEntity[]);
+          return;
+        }
+
+        resolve(result.rows as ShiftEntity[]);
+      } catch (e) {
+        this.logger.error(`exception retrieving shifts in range ${e}`);
+        reject(e);
+      }
+    });
+  }
+
+  countShiftsInRangeAndVisibility(
+    staffId: string,
+    start: Date,
+    end: Date,
+    isVisible: boolean
+  ): Promise<number> {
+    const q = `
+      SELECT COUNT(s.shift_id) FROM shift s
+      WHERE s.staff_id = $1
+      AND (
+          (s.shift_start BETWEEN $2 AND $3) OR
+          (s.shift_end BETWEEN $2 AND $3)
+      )
+      AND is_visible = $4
+    `;
+
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        const res = await this.db.exec(q, staffId, start, end, isVisible);
+        const row = res.rows[0];
+        if (!row) {
+          resolve(0);
+          return;
+        }
+        resolve(Number(row.count));
+      } catch (e) {
+        this.logger.error(e);
+        reject(e);
+      }
+    });
   }
 }

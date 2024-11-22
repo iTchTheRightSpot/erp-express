@@ -17,6 +17,7 @@ import moment from 'moment-timezone';
 import { ServiceEntity } from '@models/service/service.model';
 import Decimal from 'decimal.js';
 import { ShiftEntity } from '@models/shift/shift.model';
+import { InsertionException } from '@exceptions/insertion.exception';
 
 export class ReservationService implements IReservationService {
   constructor(
@@ -107,6 +108,16 @@ export class ReservationService implements IReservationService {
     );
     const end = start.clone().add(durationSum, 'seconds');
 
+    const validShift =
+      await this.adapters.shiftStore.countShiftsInRangeAndVisibility(
+        staff.staff_id,
+        start.toDate(),
+        end.toDate(),
+        true
+      );
+    if (validShift <= 0)
+      throw new BadRequestException('invalid reservation time');
+
     await this.checkReservationConflicts(
       staff.staff_id,
       start.toDate(),
@@ -134,12 +145,25 @@ export class ReservationService implements IReservationService {
         scheduled_for: start.toDate(),
         expire_at: end.toDate()
       } as ReservationEntity);
+
       for (let entity of matchedServices) {
         await adapters.serviceReservationStore.save({
           reservation_id: reservation.reservation_id,
           service_id: entity.service_id
         } as ServiceReservationEntity);
       }
+
+      const count =
+        await this.adapters.reservationStore.countReservationsForStaffByTimeAndStatuses(
+          staff.staff_id,
+          start.toDate(),
+          end.toDate(),
+          ReservationEnum.PENDING,
+          ReservationEnum.CONFIRMED
+        );
+
+      if (count > 1)
+        throw new InsertionException('reservation is no longer available');
     });
 
     await this.mailService.sendAppointmentCreation();

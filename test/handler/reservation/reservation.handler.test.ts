@@ -12,6 +12,8 @@ import { env } from '@utils/env';
 import { StaffEntity, StaffServiceEntity } from '@models/staff/staff.model';
 import Decimal from 'decimal.js';
 import { ServiceEntity } from '@models/service/service.model';
+import { InsertionException } from '@exceptions/insertion.exception';
+import { ShiftEntity } from '../../../src/models/shift/shift.model';
 
 describe('reservation handler', () => {
   let app: Application;
@@ -49,28 +51,45 @@ describe('reservation handler', () => {
 
   afterEach(async () => await client.query('ROLLBACK'));
 
-  it('should create a reservation', async () => {
-    // given
-    const body = {
-      staff_id: staff.uuid,
-      name: 'erp user',
-      email: 'erp@email.com',
-      services: [erp.name],
-      timezone: 'America/Toronto',
-      time: new Date().getTime()
-    };
+  describe('bare bone endpoints', () => {
+    it('should create a reservation', async () => {
+      // given
+      const start = logger.date();
+      start.setHours(9);
+      const end = new Date(start);
+      end.setHours(end.getHours() + 8);
 
-    // route to test
-    const res = await request(app)
-      .post(`${env.ROUTE_PREFIX}reservation`)
-      .send(body)
-      .set('Content-Type', 'application/json');
+      // pre-save
+      await adapters.shiftStore.save({
+        staff_id: staff.staff_id,
+        shift_start: start,
+        shift_end: end,
+        is_visible: true
+      } as ShiftEntity);
 
-    // assert
-    expect(res.status).toEqual(201);
+      const body = {
+        staff_id: staff.uuid,
+        name: 'erp user',
+        email: 'erp@email.com',
+        services: [erp.name],
+        timezone: logger.timezone(),
+        time: start.getTime()
+      };
+
+      // route to test
+      const res = await request(app)
+        .post(`${env.ROUTE_PREFIX}reservation`)
+        .send(body)
+        .set('Content-Type', 'application/json');
+
+      // assert
+      expect(res.status).toEqual(201);
+    });
   });
 
   describe('flow of creating an appointment', () => {
+    it(`simulate multiple users trying to reserve the same time. should throw ${InsertionException.name}`, async () => {});
+
     it('should retrieve all available appointment for staff. 1 service as a param', async () => {
       const timezone = 'America/Toronto';
 

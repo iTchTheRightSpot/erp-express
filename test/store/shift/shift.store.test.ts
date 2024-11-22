@@ -82,6 +82,40 @@ describe('shift store', () => {
     expect(count).toEqual(2);
   });
 
+  it('should count shift in range and visibility', async () => {
+    // given
+    const end = new Date(logger.date());
+    end.setSeconds(end.getSeconds() + 3600);
+
+    const shift = {
+      staff_id: staff.staff_id,
+      shift_start: logger.date(),
+      shift_end: end,
+      is_visible: true
+    } as ShiftEntity;
+
+    await shiftStore.save(shift);
+
+    // method to test
+    const count = await shiftStore.countShiftsInRangeAndVisibility(
+      staff.staff_id,
+      logger.date(),
+      end,
+      false
+    );
+
+    const count1 = await shiftStore.countShiftsInRangeAndVisibility(
+      staff.staff_id,
+      logger.date(),
+      end,
+      true
+    );
+
+    // assert
+    expect(count).toEqual(0);
+    expect(count1).toEqual(1);
+  });
+
   it('staff shift count should be 0', async () => {
     // given
     const end = new Date(logger.date());
@@ -177,5 +211,49 @@ describe('shift store', () => {
 
     // assert
     expect(all.length).toEqual(0);
+  });
+
+  it('should calculate return shifts in range that the difference in seconds satisfies param', async () => {
+    // given
+    const date = logger.date();
+    date.setHours(9);
+
+    const start = new Date(date);
+
+    const end1 = new Date(start);
+    end1.setHours(end1.getHours() + 8);
+    await shiftStore.save({
+      staff_id: staff.staff_id,
+      shift_start: start,
+      shift_end: end1
+    } as ShiftEntity);
+
+    start.setHours(start.getHours() + 24);
+    const end2 = new Date(start);
+    end2.setHours(end2.getHours() + 7);
+
+    await shiftStore.save({
+      staff_id: staff.staff_id,
+      shift_start: start,
+      shift_end: end2
+    } as ShiftEntity);
+
+    // method to test
+    const shifts1 = await shiftStore.shiftsInRangeWithDifference(
+      staff.staff_id,
+      date,
+      end2,
+      8 * 60 * 60 // 8 hrs in seconds
+    );
+    const shifts2 = await shiftStore.shiftsInRangeWithDifference(
+      staff.staff_id,
+      date,
+      end2,
+      5 * 60 * 60 // 5 hrs in seconds
+    );
+
+    // assert
+    expect(shifts1.length).toEqual(1);
+    expect(shifts2.length).toEqual(2);
   });
 });
