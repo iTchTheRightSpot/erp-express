@@ -15,18 +15,23 @@ import { ServiceEntity } from '@models/service/service.model';
 import moment from 'moment-timezone';
 import Decimal from 'decimal.js';
 import { InsertionException } from '@exceptions/insertion.exception';
+import { ShiftEntity } from '@models/shift/shift.model';
 
 describe('reservation service', () => {
   let service: IReservationService;
   let adapters: any;
   let mailService: any;
   let cache: any;
+  const logger = new DevelopmentLogger();
 
   beforeEach(() => {
     adapters = {
       staffStore: { staffByUUID: jest.fn() },
       serviceStore: { servicesByStaffId: jest.fn() },
-      shiftStore: { countShiftsInRangeAndVisibility: jest.fn() },
+      shiftStore: {
+        countShiftsInRangeAndVisibility: jest.fn(),
+        shiftsInRangeAndVisibilityAndDifference: jest.fn()
+      },
       reservationStore: {
         countReservationsForStaffByTimeAndStatuses: jest.fn(),
         save: jest.fn()
@@ -37,13 +42,8 @@ describe('reservation service', () => {
     mailService = {
       sendAppointmentCreation: jest.fn()
     };
-    cache = { get: jest.fn(), clear: jest.fn() };
-    service = new ReservationService(
-      new DevelopmentLogger(),
-      adapters,
-      mailService,
-      cache
-    );
+    cache = { get: jest.fn(), put: jest.fn(), clear: jest.fn() };
+    service = new ReservationService(logger, adapters, mailService, cache);
   });
 
   describe('creating an appointment', () => {
@@ -298,7 +298,7 @@ describe('reservation service', () => {
         cache.get.mockReturnValue(undefined);
         adapters.staffStore.staffByUUID.mockResolvedValue({} as StaffEntity);
         adapters.serviceStore.servicesByStaffId.mockResolvedValue([
-          { name: 'rolly' } as ServiceEntity
+          { name: 'erp' } as ServiceEntity
         ] as ServiceEntity[]);
 
         // method to test & assert
@@ -306,9 +306,53 @@ describe('reservation service', () => {
           BadRequestException
         );
         await expect(service.reservationAvailability(dto)).rejects.toThrow(
-          'The following services were not found for the selected staff: erp, star gazing. Please check your input and try again'
+          'The following services were not found for the selected staff: star gazing. Please check your input and try again'
         );
       });
+    });
+
+    it('should retrieve valid reservation times', async () => {
+      const start = logger.date();
+      start.setHours(9);
+      const end = new Date(start);
+      end.setHours(end.getHours() + 8);
+
+      // given
+      const dto = {
+        staff_id: 'staff-uuid',
+        services: ['erp'],
+        start: start,
+        end: end,
+        timezone: 'America/Toronto'
+      } as AvailableTimesPayload;
+
+      // when
+      cache.get.mockReturnValue(undefined);
+      adapters.staffStore.staffByUUID.mockResolvedValue({
+        staff_id: '1'
+      } as StaffEntity);
+      adapters.serviceStore.servicesByStaffId.mockResolvedValue([
+        {
+          name: 'erp',
+          duration: 3600,
+          clean_up_time: 60 * 30,
+          is_visible: true
+        } as ServiceEntity
+      ] as ServiceEntity[]);
+      adapters.shiftStore.shiftsInRangeAndVisibilityAndDifference.mockResolvedValue(
+        [
+          {
+            staff_id: '1',
+            shift_start: start,
+            shift_end: end,
+            is_visible: true
+          }
+        ] as ShiftEntity[]
+      );
+
+      // method to test
+      const reservations = await service.reservationAvailability(dto);
+      expect(reservations.length).toBeGreaterThan(0);
     });
   });
 });

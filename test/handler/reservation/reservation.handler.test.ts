@@ -51,6 +51,11 @@ describe('reservation handler', () => {
 
   afterEach(async () => await client.query('ROLLBACK'));
 
+  afterAll(async () => {
+    client.release();
+    await pool.end();
+  });
+
   describe('creating a reservation', () => {
     it('invalid service', async () => {
       const body = {
@@ -211,6 +216,27 @@ describe('reservation handler', () => {
   });
 
   describe('flow of creating a reservation', () => {
-    it('multiple users attempting to reserve the same time. only one should receive 201', async () => {});
+    it('multiple users attempting to reserve the same time same timezone. only one should receive 201', async () => {
+      // given
+      const date = logger.date();
+      date.setHours(9);
+      const end = new Date(date);
+      end.setHours(date.getHours() + 8);
+
+      await adapters.shiftStore.save({
+        staff_id: staff.staff_id,
+        shift_start: date,
+        shift_end: end,
+        is_visible: true
+      } as ShiftEntity);
+
+      const res = await request(app)
+        .get(
+          `${env.ROUTE_PREFIX}reservation?staff_id=${staff.uuid}&services=erp&month=${date.getMonth()}&year=${date.getFullYear()}&timezone=${logger.timezone()}`
+        )
+        .set('Content-Type', 'application/json');
+
+      const body = res.body as AvailableTimesPayload[];
+    });
   });
 });
