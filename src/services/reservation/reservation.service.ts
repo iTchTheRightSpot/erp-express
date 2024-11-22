@@ -102,6 +102,9 @@ export class ReservationService implements IReservationService {
       r.timezone,
       this.logger.timezone()
     );
+    if (start.toDate() < this.logger.date())
+      throw new BadRequestException('cannot make a reservation for a past day');
+
     const durationSum = matchedServices.reduce(
       (sum, s) => sum + (s.duration + s.clean_up_time),
       0
@@ -194,6 +197,52 @@ export class ReservationService implements IReservationService {
     );
   };
 
+  private readonly filterChunks = async (
+    staffId: string,
+    duration: number,
+    chunks: { start: Date; times: Date[] }[]
+  ) => {
+    // map over chunks to process each in parallel
+    const filter = await Promise.all(
+      chunks.map(async (chunk) => {
+        // process each time asynchronously and collect results
+        const availableTimes = await Promise.all(
+          chunk.times.map(async (time) => {
+            const end = new Date(time);
+            end.setSeconds(end.getSeconds() + duration);
+
+            // fetch reservation count for each time slot
+            const count =
+              await this.adapters.reservationStore.countReservationsForStaffByTimeAndStatuses(
+                staffId,
+                time,
+                end,
+                ReservationEnum.CONFIRMED,
+                ReservationEnum.PENDING
+              );
+
+            // return time if count is zero (available)
+            return count === 0 ? time.getTime() : null;
+          })
+        );
+
+        // filter out null values (only available times)
+        const validTimes = availableTimes.filter((time) => time !== null);
+
+        // return the filtered chunk only if there are valid times
+        return validTimes.length > 0
+          ? ({
+              date: chunk.start.getTime(),
+              times: validTimes
+            } as AvailableTimesResponse)
+          : null;
+      })
+    );
+
+    // filter out any empty or null chunks
+    return filter.filter((result) => result !== null);
+  };
+
   async reservationAvailability(
     o: AvailableTimesPayload
   ): Promise<AvailableTimesResponse[]> {
@@ -215,25 +264,25 @@ export class ReservationService implements IReservationService {
       0
     );
 
-    // 2. find said staffs working hrs.
-    // 2i. in the query, make sure the difference between
-    // working hrs is greater than sum (point 1). use
-    // DATEDIFF sql function.
-    const shifts = await this.adapters.shiftStore.shiftsInRangeWithDifference(
-      staff.staff_id,
-      o.start,
-      o.end,
-      durationSum
-    );
+    // 2. find said staffs working hrs that is greater
+    // than sum of services duration
+    const shifts =
+      await this.adapters.shiftStore.shiftsInRangeAndVisibilityAndDifference(
+        staff.staff_id,
+        o.start,
+        o.end,
+        true,
+        durationSum
+      );
 
     // 3. in parallel, generate chunks of reservation times
-    // based on each shift.
-    const chunks = this.generateChunks(shifts, durationSum);
+    const chunks = await this.generateChunks(shifts, durationSum);
 
     // 4. in parallel filter times that contain in reservation
-    // table with statuses PENDING, CONFIRMED
-    // 5. transform to unix and respond.
+    // table with statuses PENDING, CONFIRMED & transform to unix and respond.
+    const filter = await this.filterChunks(staff.staff_id, durationSum, chunks);
+    this.cache.put(key, filter);
 
-    return Promise.resolve([]);
+    return filter;
   }
 }

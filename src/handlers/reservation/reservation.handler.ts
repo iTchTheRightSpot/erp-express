@@ -58,7 +58,7 @@ export class ReservationHandler {
       );
 
       const date = this.logger.date();
-      date.setMonth(obj.month - 1);
+      date.setMonth(obj.month);
       date.setFullYear(obj.year);
       const startInTimezone = moment(date).tz(resolvedTimezone);
       const lastDateOfMonth = startInTimezone.clone().endOf('month');

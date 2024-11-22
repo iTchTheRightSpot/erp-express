@@ -14,10 +14,11 @@ export interface IShiftStore {
     start: Date,
     end: Date
   ): Promise<ShiftEntity[]>;
-  shiftsInRangeWithDifference(
+  shiftsInRangeAndVisibilityAndDifference(
     staffId: string,
     start: Date,
     end: Date,
+    isVisible: boolean,
     seconds: number
   ): Promise<ShiftEntity[]>;
 }

@@ -92,31 +92,38 @@ export class ShiftStore implements IShiftStore {
     });
   }
 
-  shiftsInRangeWithDifference(
+  shiftsInRangeAndVisibilityAndDifference(
     staffId: string,
     start: Date,
     end: Date,
+    isVisible: boolean,
     seconds: number
   ): Promise<ShiftEntity[]> {
     const q = `
-      SELECT * FROM shift s
-      WHERE s.staff_id = $1
-      AND (
-          (s.shift_start BETWEEN $2 AND $3) OR
-          (s.shift_end BETWEEN $2 AND $3)
-      )
-      AND EXTRACT(EPOCH FROM (s.shift_end - s.shift_start)) >= $4
+        SELECT * FROM shift s
+        WHERE s.staff_id = $1
+        AND (
+            (s.shift_start BETWEEN $2 AND $3) OR
+            (s.shift_end BETWEEN $2 AND $3)
+        )
+        AND is_visible = $4
+        AND EXTRACT(EPOCH FROM (s.shift_end - s.shift_start)) >= $5
     `;
 
     return new Promise<ShiftEntity[]>(async (resolve, reject) => {
       try {
-        const result = await this.db.exec(q, staffId, start, end, seconds);
-
+        const result = await this.db.exec(
+          q,
+          staffId,
+          start,
+          end,
+          isVisible,
+          seconds
+        );
         if (!result.rows) {
           resolve([] as ShiftEntity[]);
           return;
         }
-
         resolve(result.rows as ShiftEntity[]);
       } catch (e) {
         this.logger.error(`exception retrieving shifts in range ${e}`);

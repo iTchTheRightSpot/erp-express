@@ -225,7 +225,8 @@ describe('shift store', () => {
     await shiftStore.save({
       staff_id: staff.staff_id,
       shift_start: start,
-      shift_end: end1
+      shift_end: end1,
+      is_visible: true
     } as ShiftEntity);
 
     start.setHours(start.getHours() + 24);
@@ -235,20 +236,23 @@ describe('shift store', () => {
     await shiftStore.save({
       staff_id: staff.staff_id,
       shift_start: start,
-      shift_end: end2
+      shift_end: end2,
+      is_visible: true
     } as ShiftEntity);
 
     // method to test
-    const shifts1 = await shiftStore.shiftsInRangeWithDifference(
+    const shifts1 = await shiftStore.shiftsInRangeAndVisibilityAndDifference(
       staff.staff_id,
       date,
       end2,
+      true,
       8 * 60 * 60 // 8 hrs in seconds
     );
-    const shifts2 = await shiftStore.shiftsInRangeWithDifference(
+    const shifts2 = await shiftStore.shiftsInRangeAndVisibilityAndDifference(
       staff.staff_id,
       date,
       end2,
+      true,
       5 * 60 * 60 // 5 hrs in seconds
     );
 
