@@ -77,4 +77,54 @@ export class ReservationStore implements IReservationStore {
       }
     });
   }
+
+  selectForUpdateSave(
+    o: ReservationEntity,
+    ...status: ReservationEnum[]
+  ): Promise<ReservationEntity> {
+    const statuses = `(${[...status].map((status) => `'${status}'`).join(', ')})`;
+    const q = `
+        WITH conflicting_reservations AS (
+            SELECT reservation_id FROM reservation
+            WHERE staff_id = $1
+              AND scheduled_for BETWEEN $11 AND $12
+              AND status IN ${statuses}
+            FOR UPDATE  -- lock rows if any conflict exists
+        )
+        INSERT INTO reservation (staff_id, name, email, description, address, phone, image_key, price, status, created_at, scheduled_for, expire_at)
+        SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+        WHERE NOT EXISTS (SELECT 1 FROM conflicting_reservations)
+        RETURNING reservation_id, staff_id, name, email, description, address, phone, image_key, price, status, created_at, scheduled_for, expire_at;
+    `;
+    return new Promise<ReservationEntity>(async (resolve, reject) => {
+      try {
+        const res = await this.db.exec(
+          q,
+          o.staff_id,
+          o.name.trim(),
+          o.email.trim(),
+          o.description?.trim() || null,
+          o.address?.trim() || null,
+          o.phone?.trim() || null,
+          o.image_key?.trim() || null,
+          o.price.toFixed(2),
+          o.status,
+          o.created_at,
+          o.scheduled_for,
+          o.expire_at
+        );
+        if (!res.rows) {
+          reject(undefined);
+          return;
+        }
+
+        resolve(res.rows[0] as ReservationEntity);
+      } catch (e) {
+        this.logger.error(
+          `exception counting reservations associated to staff id ${o.staff_id}. err: ${e}`
+        );
+        reject(e);
+      }
+    });
+  }
 }

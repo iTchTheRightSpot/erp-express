@@ -139,11 +139,11 @@ export class ShiftStore implements IShiftStore {
     isVisible: boolean
   ): Promise<number> {
     const q = `
-      SELECT COUNT(s.shift_id) FROM shift s
+      SELECT COUNT(*) FROM shift s
       WHERE s.staff_id = $1
       AND (
-          (s.shift_start BETWEEN $2 AND $3) OR
-          (s.shift_end BETWEEN $2 AND $3)
+          ($2 BETWEEN s.shift_start AND s.shift_end) AND
+          ($3 BETWEEN s.shift_start AND s.shift_end)
       )
       AND is_visible = $4
     `;

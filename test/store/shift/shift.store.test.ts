@@ -255,9 +255,17 @@ describe('shift store', () => {
       true,
       5 * 60 * 60 // 5 hrs in seconds
     );
+    const shifts3 = await shiftStore.shiftsInRangeAndVisibilityAndDifference(
+      staff.staff_id,
+      date,
+      new Date(date.getFullYear(), date.getMonth() + 1, 0),
+      true,
+      60 * 60 // 1 hr in seconds
+    );
 
     // assert
     expect(shifts1.length).toEqual(1);
     expect(shifts2.length).toEqual(2);
+    expect(shifts3.length).toEqual(2);
   });
 });

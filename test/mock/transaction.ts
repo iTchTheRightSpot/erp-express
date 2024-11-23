@@ -13,13 +13,10 @@ export class MockLiveTransactionProvider implements ITransactionProvider {
   async runInTransaction<T>(
     txFunc: (adapters: Adapters) => Promise<T>
   ): Promise<T> {
-    const adap = initializeAdapters(
-      this.logger,
-      new MockLiveDatabaseClient(this.client)
-    );
-
     try {
-      return await txFunc(adap);
+      return await txFunc(
+        initializeAdapters(this.logger, new MockLiveDatabaseClient(this.client))
+      );
     } catch (error) {
       this.logger.log('test transaction error: ', error);
       throw error;

@@ -61,7 +61,8 @@ describe('shift handler', () => {
   describe('creating a staffs working hrs', () => {
     it('successful creation', async () => {
       const date = logger.date();
-      date.setSeconds(date.getSeconds() + 24 * 60 * 60);
+      date.setDate(date.getDate() + 1);
+      date.setHours(9, 0, 0, 0);
 
       // given
       const body = {
@@ -175,14 +176,16 @@ describe('shift handler', () => {
     it('invalid month param', async () => {
       // route to test
       const res = await request(app)
-        .get(`${env.ROUTE_PREFIX}shift?month=13&year=2023`)
+        .get(`${env.ROUTE_PREFIX}shift?month=0&year=2023`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .set('Cookie', [`${env.COOKIENAME}=${token}`]);
 
       // assert
       expect(res.status).toEqual(400);
-      expect(res.body.message).toEqual('"month" must be a valid month (1-12)');
+      expect(res.body.message).toContain(
+        '"month" must be a valid month (1-12)'
+      );
     });
 
     it('success', async () => {

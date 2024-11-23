@@ -25,9 +25,11 @@ describe('shift model', () => {
   });
 
   it(`should throw ${BadRequestException.name} overlap between shifts`, () => {
-    const d = new Date();
-    d.setSeconds(d.getSeconds() + 24 * 60 * 60);
-    const str = d.toISOString();
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    date.setHours(9, 0, 0, 0);
+
+    const str = date.toISOString();
     payload.times = [
       validShiftSegment(str, 3600),
       validShiftSegment(str, 3600)

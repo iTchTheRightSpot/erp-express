@@ -34,7 +34,7 @@ describe('reservation service', () => {
       },
       reservationStore: {
         countReservationsForStaffByTimeAndStatuses: jest.fn(),
-        save: jest.fn()
+        selectForUpdateSave: jest.fn()
       },
       txProvider: { runInTransaction: jest.fn() },
       serviceReservationStore: { save: jest.fn() }
@@ -57,7 +57,7 @@ describe('reservation service', () => {
       // method to test & assert
       await expect(service.create(dto)).rejects.toThrow(NotFoundException);
       await expect(service.create(dto)).rejects.toThrow('invalid staff id');
-      expect(adapters.reservationStore.save).toHaveBeenCalledTimes(0);
+      expect(adapters.serviceStore.servicesByStaffId).toHaveBeenCalledTimes(0);
     });
 
     describe(`should throw ${BadRequestException.name} staff does not offer service`, () => {
@@ -176,9 +176,9 @@ describe('reservation service', () => {
           await callback(adapters);
         }
       );
-      adapters.reservationStore.save.mockResolvedValue({
-        reservation_id: '1'
-      } as ReservationEntity);
+      adapters.reservationStore.selectForUpdateSave.mockResolvedValue(
+        undefined
+      );
       adapters.serviceReservationStore.save.mockResolvedValue(
         {} as ServiceReservationEntity
       );
@@ -214,7 +214,9 @@ describe('reservation service', () => {
       adapters.txProvider.runInTransaction.mockImplementation(
         async (callback: any) => await callback(adapters)
       );
-      adapters.reservationStore.save.mockResolvedValue({} as ReservationEntity);
+      adapters.reservationStore.selectForUpdateSave.mockResolvedValue(
+        {} as ReservationEntity
+      );
       adapters.serviceReservationStore.save.mockResolvedValue(
         {} as ServiceReservationEntity
       );
@@ -226,7 +228,9 @@ describe('reservation service', () => {
       await service.create(dto);
 
       // assert
-      expect(adapters.reservationStore.save).toHaveBeenCalledTimes(1);
+      expect(
+        adapters.reservationStore.selectForUpdateSave
+      ).toHaveBeenCalledTimes(1);
       expect(adapters.serviceReservationStore.save).toHaveBeenCalledTimes(2);
       expect(mailService.sendAppointmentCreation).toHaveBeenCalled();
       expect(cache.clear).toHaveBeenCalled();
@@ -334,8 +338,8 @@ describe('reservation service', () => {
       adapters.serviceStore.servicesByStaffId.mockResolvedValue([
         {
           name: 'erp',
-          duration: 3600,
-          clean_up_time: 60 * 30,
+          duration: 1800, // 30 mins
+          clean_up_time: 1800, // 30 mins
           is_visible: true
         } as ServiceEntity
       ] as ServiceEntity[]);
@@ -349,10 +353,14 @@ describe('reservation service', () => {
           }
         ] as ShiftEntity[]
       );
+      adapters.reservationStore.countReservationsForStaffByTimeAndStatuses.mockResolvedValue(
+        0
+      );
 
       // method to test
       const reservations = await service.reservationAvailability(dto);
-      expect(reservations.length).toBeGreaterThan(0);
+      expect(reservations.length).toEqual(1);
+      expect(reservations[0].times.length).toEqual(8);
     });
   });
 });

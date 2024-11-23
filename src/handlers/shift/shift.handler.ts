@@ -78,13 +78,10 @@ export class ShiftHandler {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const dto = new ShiftPayload(req.body as ShiftPayload);
-      await this.service.create(
-        dto.checkForOverLappingSegments(
-          this.logger.date(),
-          this.logger.timezone()
-        )
-      );
+      const payload = new ShiftPayload(
+        req.body as ShiftPayload
+      ).checkForOverLappingSegments(this.logger.date(), this.logger.timezone());
+      await this.service.create(payload);
       res.status(201).send({});
     } catch (e) {
       next(e);

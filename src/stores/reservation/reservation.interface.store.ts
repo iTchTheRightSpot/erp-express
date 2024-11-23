@@ -12,6 +12,10 @@ export interface IReservationStore {
     end: Date,
     ...status: ReservationEnum[]
   ): Promise<number>;
+  selectForUpdateSave(
+    o: ReservationEntity,
+    ...status: ReservationEnum[]
+  ): Promise<ReservationEntity>;
 }
 
 export interface IServiceReservationStore {

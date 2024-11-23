@@ -84,8 +84,6 @@ export class ShiftPayload {
     };
 
     for (let i = 0; i < this.times.length; i++) {
-      let parse: moment.Moment;
-
       const m = moment(this.times[i].start, moment.ISO_8601, true);
 
       if (!m.isValid())
@@ -93,7 +91,7 @@ export class ShiftPayload {
           `${this.times[i].start} has to be in ISO format (ISO 8601)`
         );
 
-      parse = m.tz(timezone);
+      const parse = m.tz(timezone);
       if (!parse.isValid())
         throw new BadRequestException(
           `invalid date ${JSON.stringify(this.times[i].start)}`

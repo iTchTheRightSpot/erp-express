@@ -5,20 +5,24 @@ import { DevelopmentLogger } from '@utils/log';
 import { poolInstance } from '@mock/pool';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { MockLiveTransactionProvider } from '@mock/transaction';
-import { initializeServices } from '@services/services';
+import { initializeServices, ServicesRegistry } from '@services/services';
 import { createApp } from '@erp/app';
 import request from 'supertest';
 import { env } from '@utils/env';
 import { StaffEntity, StaffServiceEntity } from '@models/staff/staff.model';
 import Decimal from 'decimal.js';
 import { ServiceEntity } from '@models/service/service.model';
-import { ShiftEntity } from '@models/shift/shift.model';
-import { AvailableTimesPayload } from '@models/reservation/reservation.model';
+import { ShiftEntity, ShiftPayload } from '@models/shift/shift.model';
+import { AvailableTimesResponse } from '@models/reservation/reservation.model';
+import { IJwtObject } from '@models/auth.model';
+import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
+import { twoDaysInSeconds } from '@utils/util';
 
 describe('reservation handler', () => {
   let app: Application;
   let pool: Pool;
   let client: PoolClient;
+  let servicesRegistry: ServicesRegistry;
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
   let staff: StaffEntity;
@@ -30,8 +34,8 @@ describe('reservation handler', () => {
     const db = new MockLiveDatabaseClient(client);
     const tx = new MockLiveTransactionProvider(logger, client);
     adapters = initializeAdapters(logger, db, tx);
-    const services = initializeServices(logger, adapters);
-    app = createApp(logger, services);
+    servicesRegistry = initializeServices(logger, adapters);
+    app = createApp(logger, servicesRegistry);
   });
 
   beforeEach(async () => {
@@ -180,15 +184,6 @@ describe('reservation handler', () => {
       // given
       const date = logger.date();
       date.setHours(9);
-      const end = new Date(date);
-      end.setHours(date.getHours() + 8);
-
-      await adapters.shiftStore.save({
-        staff_id: staff.staff_id,
-        shift_start: date,
-        shift_end: end,
-        is_visible: true
-      } as ShiftEntity);
 
       const accounting = await adapters.serviceStore.save({
         name: 'accounting',
@@ -210,33 +205,95 @@ describe('reservation handler', () => {
 
       // assert
       expect(res.status).toEqual(200);
-      const body = res.body as AvailableTimesPayload[];
-      expect(body.length).toBeGreaterThan(0);
     });
   });
 
   describe('flow of creating a reservation', () => {
-    it('multiple users attempting to reserve the same time same timezone. only one should receive 201', async () => {
+    let token = '';
+    beforeEach(async () => {
+      const obj: IJwtObject = {
+        user_id: staff.uuid,
+        access_controls: [
+          { role: RoleEnum.STAFF, permissions: [PermissionEnum.WRITE] }
+        ] as IRolePermission[]
+      };
+      const j = await servicesRegistry.jwtService.createJwt(
+        obj,
+        twoDaysInSeconds
+      );
+      token = j.token;
+    });
+
+    it('concurrent requests to reserve the same time in the same timezone. only one should receive 201', async () => {
       // given
       const date = logger.date();
-      date.setHours(9);
-      const end = new Date(date);
-      end.setHours(date.getHours() + 8);
+      date.setDate(date.getDate() + 1);
+      date.setHours(9, 0, 0, 0);
 
-      await adapters.shiftStore.save({
-        staff_id: staff.staff_id,
-        shift_start: date,
-        shift_end: end,
-        is_visible: true
-      } as ShiftEntity);
+      // simulate staff creating schedule
+      const shiftPayload = new ShiftPayload();
+      shiftPayload.staff_id = staff.uuid;
+      shiftPayload.times = [
+        {
+          is_visible: true,
+          is_reoccurring: false,
+          start: date.toISOString(),
+          duration: 8 * 60 * 60
+        }
+      ];
 
-      const res = await request(app)
+      const createScheduleResponse = await request(app)
+        .post(`${env.ROUTE_PREFIX}shift`)
+        .send(shiftPayload)
+        .set('Content-Type', 'application/json')
+        .set('Cookie', [`${env.COOKIENAME}=${token}`]);
+
+      expect(createScheduleResponse.status).toEqual(201);
+
+      // simulate all users querying for available schedules
+      const getReservationResponse = await request(app)
         .get(
           `${env.ROUTE_PREFIX}reservation?staff_id=${staff.uuid}&services=erp&month=${date.getMonth()}&year=${date.getFullYear()}&timezone=${logger.timezone()}`
         )
         .set('Content-Type', 'application/json');
 
-      const body = res.body as AvailableTimesPayload[];
+      const getReservationResponseBody =
+        getReservationResponse.body as AvailableTimesResponse[];
+      expect(getReservationResponseBody.length).toBeGreaterThan(0);
+      expect(getReservationResponseBody[0].times.length).toBeGreaterThan(0);
+
+      // simulate multiple users attempting to reserve the same time
+      const arr = Array.from({ length: 10 }, (_, i) => {
+        const body = {
+          staff_id: staff.uuid,
+          name: `erp user-${i + 1}`,
+          email: `erp-user-${i + 1}@email.com`,
+          services: [erp.name],
+          timezone: logger.timezone(),
+          time: getReservationResponseBody[0].times[1]
+        };
+
+        // concurrent reservation request
+        return request(app)
+          .post(`${env.ROUTE_PREFIX}reservation`)
+          .send(body)
+          .set('Content-Type', 'application/json');
+      });
+
+      const allCreateReservationResponses = await Promise.all(arr);
+      const results = allCreateReservationResponses.map((res) => ({
+        status: res.status,
+        message: res.body?.message
+      }));
+
+      // assert
+      expect(
+        results.filter(
+          (obj) => obj.message === 'reservation is no longer available'
+        ).length
+      ).toBe(9);
+      expect(results.filter((obj) => obj.status === 201).length).toBe(1);
+      expect(results.filter((obj) => obj.status === 415).length).toBe(9);
     });
   });
 });
