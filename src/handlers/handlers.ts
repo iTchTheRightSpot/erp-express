@@ -4,11 +4,13 @@ import { ServicesRegistry } from '@services/services';
 import { ShiftHandler } from './shift/shift.handler';
 import { ServiceHandler } from './service/service.handler';
 import { StaffHandler } from './staff/staff.handler';
+import { ReservationHandler } from '@handlers/reservation/reservation.handler';
 
 interface IHandlers {
   shiftHandler: ShiftHandler;
   serviceHandler: ServiceHandler;
   staffHandler: StaffHandler;
+  reservationHandler: ReservationHandler;
 }
 
 export const initializeHandlers = (
@@ -24,7 +26,12 @@ export const initializeHandlers = (
       logger,
       services.servicesOffered
     ),
-    staffHandler: new StaffHandler(router, logger, services.staffService)
+    staffHandler: new StaffHandler(router, logger, services.staffService),
+    reservationHandler: new ReservationHandler(
+      router,
+      logger,
+      services.reservationService
+    )
   };
   return handlers;
 };

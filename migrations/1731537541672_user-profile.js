@@ -20,7 +20,7 @@ exports.up = (pgm) => {
       },
       firstname: { type: 'varchar(100)', notNull: true, unique: false },
       lastname: { type: 'varchar(100)', notNull: true, unique: false },
-      email: { type: 'varchar(255)', notNull: true, unique: true },
+      email: { type: 'varchar(320)', notNull: true, unique: true },
       image_key: { type: 'varchar(255)', notNull: false, unique: false }
     },
     {

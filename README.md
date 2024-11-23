@@ -58,6 +58,12 @@
    - Only staffs can send invoices to clients.
    - Clients should be able to pay via online invoice.
 
+## Design pattern
+
+1. Dependency inversion & injection.
+2. Test driven development (TDD).
+3. Transaction provider pattern.
+
 ## Development docs
 
 1. [Schema design](https://dbdiagram.io/d/landscape-erp-66303ee65b24a634d01e83ea).

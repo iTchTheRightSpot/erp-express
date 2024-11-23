@@ -1,9 +1,9 @@
-import { IPermission, IRole } from '@models/role.model';
+import { PermissionEntity, RoleEntity } from '@models/role.model';
 
 export interface IRoleStore {
-  save(obj: IRole): Promise<IRole>;
+  save(obj: RoleEntity): Promise<RoleEntity>;
 }
 
 export interface IPermissionStore {
-  save(obj: IPermission): Promise<IPermission>;
+  save(obj: PermissionEntity): Promise<PermissionEntity>;
 }

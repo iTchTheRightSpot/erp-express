@@ -31,7 +31,10 @@ export class StaffService implements IStaffService {
         staff.staff_id,
         service.service_id
       );
-    if (count) throw new InsertionException('duplicate service name for staff');
+    if (count > 0)
+      throw new InsertionException(
+        `staff with id ${staffUUID} already offers ${serviceName}`
+      );
 
     await this.adapter.staffServiceStore.save({
       staff_id: staff.staff_id,

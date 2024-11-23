@@ -1,13 +1,13 @@
 import { env } from '@utils/env';
 import { createApp } from './app';
 import { Pool } from 'pg';
-import { DevelopmentLogger, LoggerImpl } from '@utils/log';
+import { DevelopmentLogger, ProductionLogger } from '@utils/log';
 import { DatabaseClient } from '@stores/db-client';
 import { TransactionProvider } from '@stores/transaction';
 import { initializeAdapters } from '@stores/adapters';
 import { initializeServices } from '@services/services';
 
-const init = async () => {
+const init = () => {
   const pool = new Pool({
     user: env.DB_CONFIG.user,
     password: env.DB_CONFIG.password,
@@ -20,7 +20,7 @@ const init = async () => {
   });
 
   const logger = env.COOKIESECURE
-    ? new LoggerImpl(env.LOGGER, 'America/Toronto')
+    ? new ProductionLogger(env.LOGGER, 'America/Toronto')
     : new DevelopmentLogger('America/Toronto');
   const db = new DatabaseClient(pool);
   const tx = new TransactionProvider(logger, pool);
@@ -42,10 +42,4 @@ const init = async () => {
   return createApp(logger, services);
 };
 
-init()
-  .then((app) =>
-    app.listen(env.PORT, () =>
-      console.log(`erp api listening on port ${env.PORT}`)
-    )
-  )
-  .catch((err) => console.log(err));
+init().listen(env.PORT, () => console.log(`api listening on port ${env.PORT}`));

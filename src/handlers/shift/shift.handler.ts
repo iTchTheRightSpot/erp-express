@@ -8,9 +8,9 @@ import {
 import { ILogger } from '@utils/log';
 import { IShiftService } from '@services/shift/shift.interface.service';
 import { middleware } from '@middlewares/middleware';
-import { ShiftPayload } from '@models/shift/shift.model';
+import { AllShiftsPayload, ShiftPayload } from '@models/shift/shift.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
-import moment from 'moment-timezone';
+import { isInvalidateMonthYear, resolveTimezone } from '@handlers/util.handler';
 
 export class ShiftHandler {
   constructor(
@@ -41,37 +41,6 @@ export class ShiftHandler {
     );
   };
 
-  private readonly isInvalidateReq = (month: any, year: any) => {
-    if (!month || !year) {
-      const m = '"month" and "year" query parameters are required';
-      this.logger.error(m);
-      return {
-        message: m,
-        bool: true
-      };
-    }
-
-    const monthNumber = parseInt(month as string, 10);
-    const yearNumber = parseInt(year as string, 10);
-
-    if (isNaN(monthNumber) || isNaN(yearNumber)) {
-      const m = '"month" and "year" must be valid numbers';
-      this.logger.error(m);
-      return {
-        message: m,
-        bool: true
-      };
-    }
-
-    if (!moment(monthNumber, 'M', true).isValid()) {
-      const m = '"month" must be a valid month (1-12)';
-      this.logger.error(m);
-      return { message: m, bool: true };
-    }
-
-    return { message: '', bool: false };
-  };
-
   private readonly shifts: RequestHandler = async (
     req: Request,
     res: Response,
@@ -79,34 +48,26 @@ export class ShiftHandler {
   ) => {
     const { staff_id, month, year, timezone } = req.query;
 
-    const obj = this.isInvalidateReq(month, year);
-
-    if (obj.bool) {
-      res.setHeader('Content-Type', 'application/json').status(400).json({
-        status: 400,
-        message: obj.message
-      });
-      return;
-    }
-
-    const timezoneFromRequest = timezone as string | undefined;
     const staffId = staff_id as string | undefined;
 
     try {
-      const resolvedTimezone =
-        timezoneFromRequest?.length && moment.tz.zone(timezoneFromRequest)
-          ? timezoneFromRequest
-          : this.logger.timezone();
-
-      const list = await this.service.shifts(
-        staffId || req.jwtClaim!.obj.user_id,
-        parseInt(month as string, 10),
-        parseInt(year as string, 10),
-        resolvedTimezone.trim()
+      const obj = isInvalidateMonthYear(month, year);
+      const resolvedTimezone = resolveTimezone(
+        timezone,
+        this.logger.timezone()
       );
+      const payload: AllShiftsPayload = {
+        staffUUID: staffId || req.jwtClaim!.obj.user_id,
+        month: obj.month,
+        year: obj.year,
+        timezone: resolvedTimezone.trim()
+      };
+
+      const list = await this.service.shifts(payload);
 
       res.setHeader('Content-Type', 'application/json').status(200).send(list);
     } catch (e) {
+      this.logger.log(`${ShiftHandler.name} all shifts err: ${e}`);
       next(e);
     }
   };
@@ -117,13 +78,10 @@ export class ShiftHandler {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const dto = new ShiftPayload(req.body as ShiftPayload);
-      await this.service.create(
-        dto.checkForOverLappingSegments(
-          this.logger.date(),
-          this.logger.timezone()
-        )
-      );
+      const payload = new ShiftPayload(
+        req.body as ShiftPayload
+      ).checkForOverLappingSegments(this.logger.date(), this.logger.timezone());
+      await this.service.create(payload);
       res.status(201).send({});
     } catch (e) {
       next(e);

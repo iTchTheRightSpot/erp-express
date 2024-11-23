@@ -5,7 +5,7 @@ import {
   TransactionProvider
 } from '@stores/transaction';
 import { Adapters, initializeAdapters } from '@stores/adapters';
-import { IProfile } from '@models/profile/profile.model';
+import { ProfileEntity } from '@models/profile/profile.model';
 import { poolInstance } from '@mock/pool';
 import { DevelopmentLogger } from '@utils/log';
 
@@ -30,22 +30,22 @@ describe('transaction provider', () => {
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as IProfile);
+        } as ProfileEntity);
 
-        expect(frog.profile_id).toBeGreaterThan(0);
+        expect(Number(frog.profile_id)).toBeGreaterThan(0);
         expect(await adaps.profileStore.delete(frog.profile_id)).toEqual(1);
       }));
 
     it(`should commit when ${DatabaseClient.name} is called outside of ${DatabaseTransactionClient.name}`, async () => {
-      let profileId: number | undefined = undefined;
+      let profileId: string | undefined = undefined;
       await adapters.txProvider?.runInTransaction(async (adaps) => {
         const frog = await adaps.profileStore.save({
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as IProfile);
+        } as ProfileEntity);
 
-        expect(frog.profile_id).toBeGreaterThan(0);
+        expect(Number(frog.profile_id)).toBeGreaterThan(0);
         profileId = frog.profile_id;
       });
 
@@ -59,9 +59,9 @@ describe('transaction provider', () => {
           firstname: 'dog',
           lastname: 'dog lastname',
           email: 'dog@email.com'
-        } as IProfile);
+        } as ProfileEntity);
 
-        expect(dog.profile_id).toBeGreaterThan(0);
+        expect(Number(dog.profile_id)).toBeGreaterThan(0);
 
         // connection not from pool client
         // should also be 0 because the transaction has not been committed
@@ -79,13 +79,13 @@ describe('transaction provider', () => {
           firstname: 'frog',
           lastname: 'frog lastname',
           email: 'frog@email.com'
-        } as IProfile);
+        } as ProfileEntity);
         await expect(
           adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as IProfile)
+          } as ProfileEntity)
         ).rejects.toThrow(
           'duplicate key value violates unique constraint "profile_email_key"'
         );
@@ -101,9 +101,9 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile);
+            } as ProfileEntity);
 
-            expect(frog.profile_id).toBeGreaterThan(0);
+            expect(Number(frog.profile_id)).toBeGreaterThan(0);
             return frog;
           },
           TransactionIsolationLevel.READ_UNCOMMITED
@@ -117,13 +117,13 @@ describe('transaction provider', () => {
       });
 
       it('should rollback transaction', async () => {
-        let profileId = 0;
+        let profileId = '';
         await adapters.txProvider?.runInTransaction(async (adaps) => {
           const frog = await adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as IProfile);
+          } as ProfileEntity);
 
           profileId = frog.profile_id;
 
@@ -132,7 +132,7 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile)
+            } as ProfileEntity)
           ).rejects.toThrow(
             'duplicate key value violates unique constraint "profile_email_key"'
           );
@@ -151,9 +151,9 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile);
+            } as ProfileEntity);
 
-            expect(frog.profile_id).toBeGreaterThan(0);
+            expect(Number(frog.profile_id)).toBeGreaterThan(0);
             return frog;
           },
           TransactionIsolationLevel.READ_COMMITTED
@@ -167,13 +167,13 @@ describe('transaction provider', () => {
       });
 
       it('should rollback transaction', async () => {
-        let profileId = 0;
+        let profileId = '';
         await adapters.txProvider?.runInTransaction(async (adaps) => {
           const frog = await adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as IProfile);
+          } as ProfileEntity);
 
           profileId = frog.profile_id;
 
@@ -182,7 +182,7 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile)
+            } as ProfileEntity)
           ).rejects.toThrow(
             'duplicate key value violates unique constraint "profile_email_key"'
           );
@@ -201,9 +201,9 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile);
+            } as ProfileEntity);
 
-            expect(frog.profile_id).toBeGreaterThan(0);
+            expect(Number(frog.profile_id)).toBeGreaterThan(0);
             return frog;
           },
           TransactionIsolationLevel.REPEATABLE_READ
@@ -216,13 +216,13 @@ describe('transaction provider', () => {
       });
 
       it('should rollback transaction', async () => {
-        let profileId = 0;
+        let profileId = '';
         await adapters.txProvider?.runInTransaction(async (adaps) => {
           const frog = await adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as IProfile);
+          } as ProfileEntity);
 
           profileId = frog.profile_id;
 
@@ -231,7 +231,7 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile)
+            } as ProfileEntity)
           ).rejects.toThrow(
             'duplicate key value violates unique constraint "profile_email_key"'
           );
@@ -250,9 +250,9 @@ describe('transaction provider', () => {
               firstname: 'frog',
               lastname: 'frog lastname',
               email: 'frog@email.com'
-            } as IProfile);
+            } as ProfileEntity);
 
-            expect(frog.profile_id).toBeGreaterThan(0);
+            expect(Number(frog.profile_id)).toBeGreaterThan(0);
             return frog;
           },
           TransactionIsolationLevel.SERIALIZABLE
@@ -266,13 +266,13 @@ describe('transaction provider', () => {
       });
 
       it('should rollback transaction', async () => {
-        let profileId = 0;
+        let profileId = '';
         await adapters.txProvider?.runInTransaction(async (adaps) => {
           const frog = await adaps.profileStore.save({
             firstname: 'frog',
             lastname: 'frog lastname',
             email: 'frog@email.com'
-          } as IProfile);
+          } as ProfileEntity);
 
           profileId = frog.profile_id;
 

@@ -5,13 +5,13 @@ import {
   IPermissionStore,
   IRoleStore
 } from '@stores/role/role.interface.store';
-import { IProfile } from '@models/profile/profile.model';
+import { ProfileEntity } from '@models/profile/profile.model';
 import { RoleStore } from '@stores/role/role.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
 import { ProfileStore } from '@stores/profile/profile.store';
 import {
-  IPermission,
-  IRole,
+  PermissionEntity,
+  RoleEntity,
   PermissionEnum,
   RoleEnum
 } from '@models/role.model';
@@ -27,7 +27,7 @@ describe('user_role store', () => {
   let roleStore: IRoleStore;
   let dbClient: IDatabaseClient;
   let permissionStore: IPermissionStore;
-  let profile: IProfile;
+  let profile: ProfileEntity;
 
   beforeAll(async () => {
     pool = poolInstance();
@@ -45,7 +45,7 @@ describe('user_role store', () => {
       lastname: 'lastname',
       email: 'erp@email.com',
       image_key: 'image-key'
-    } as IProfile);
+    } as ProfileEntity);
   });
 
   afterEach(async () => await client.query('ROLLBACK'));
@@ -59,45 +59,45 @@ describe('user_role store', () => {
     const role = {
       role: RoleEnum.USER,
       profile_id: profile.profile_id
-    } as IRole;
+    } as RoleEntity;
 
     // method to test
     const save = await roleStore.save(role);
 
     // assert
-    expect(save.role_id).toBeGreaterThan(0);
+    expect(Number(save.role_id)).toBeGreaterThan(0);
     expect(save.role).toEqual(RoleEnum.USER);
-    expect(save.profile_id).toBeGreaterThan(0);
+    expect(Number(save.profile_id)).toBeGreaterThan(0);
   });
 
   it(`should save user with user_role ${RoleEnum.DEVELOPER}`, async () => {
     const role = {
       role: RoleEnum.DEVELOPER,
       profile_id: profile.profile_id
-    } as IRole;
+    } as RoleEntity;
 
     // method to test
     const save = await roleStore.save(role);
 
     // assert
-    expect(save.role_id).toBeGreaterThan(0);
+    expect(Number(save.role_id)).toBeGreaterThan(0);
     expect(save.role).toEqual(RoleEnum.DEVELOPER);
-    expect(save.profile_id).toBeGreaterThan(0);
+    expect(Number(save.profile_id)).toBeGreaterThan(0);
   });
 
   it(`should save user with user_role ${RoleEnum.STAFF}`, async () => {
     const role = {
       role: RoleEnum.STAFF,
       profile_id: profile.profile_id
-    } as IRole;
+    } as RoleEntity;
 
     // method to test
     const save = await roleStore.save(role);
 
     // assert
-    expect(save.role_id).toBeGreaterThan(0);
+    expect(Number(save.role_id)).toBeGreaterThan(0);
     expect(save.role).toEqual(RoleEnum.STAFF);
-    expect(save.profile_id).toBeGreaterThan(0);
+    expect(Number(save.profile_id)).toBeGreaterThan(0);
   });
 
   it('should save permission', async () => {
@@ -105,15 +105,15 @@ describe('user_role store', () => {
     const role = await roleStore.save({
       role: RoleEnum.USER,
       profile_id: profile.profile_id
-    } as IRole);
+    } as RoleEntity);
 
     // method to test
     const save = await permissionStore.save({
       permission: PermissionEnum.WRITE,
       role_id: role.role_id
-    } as IPermission);
+    } as PermissionEntity);
 
     // assert
-    expect(save.permission_id).toBeGreaterThan(0);
+    expect(Number(save.permission_id)).toBeGreaterThan(0);
   });
 });

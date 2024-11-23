@@ -4,10 +4,10 @@ export enum RoleEnum {
   USER = 'USER'
 }
 
-export interface IRole {
-  role_id: number;
+export interface RoleEntity {
+  role_id: string;
   role: RoleEnum;
-  profile_id: number;
+  profile_id: string;
 }
 
 export enum PermissionEnum {
@@ -16,10 +16,10 @@ export enum PermissionEnum {
   DELETE = 'DELETE'
 }
 
-export interface IPermission {
-  permission_id: number;
+export interface PermissionEntity {
+  permission_id: string;
   permission: PermissionEnum;
-  role_id: number;
+  role_id: string;
 }
 
 export interface IRolePermission {

@@ -4,7 +4,7 @@ import { IProfileStore } from '@stores/profile/profile.interface.store';
 import { DevelopmentLogger } from '@utils/log';
 import { ProfileStore } from '@stores/profile/profile.store';
 import { MockLiveDatabaseClient } from '@mock/db-client';
-import { IProfile } from '@models/profile/profile.model';
+import { ProfileEntity } from '@models/profile/profile.model';
 
 describe('profile store', () => {
   let pool: Pool;
@@ -34,13 +34,13 @@ describe('profile store', () => {
       firstname: 'firstname',
       lastname: 'lastname',
       email: 'erp@email.com'
-    } as IProfile;
+    } as ProfileEntity;
 
     // method to test
     const save = await store.save(u);
 
     // assert
-    expect(save.profile_id).toBeGreaterThan(0);
+    expect(Number(save.profile_id)).toBeGreaterThan(0);
     expect(save.firstname).toEqual(u.firstname);
     expect(save.lastname).toEqual(u.lastname);
     expect(save.email).toEqual(u.email);

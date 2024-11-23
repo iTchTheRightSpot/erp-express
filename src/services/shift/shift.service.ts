@@ -1,8 +1,9 @@
 import { IShiftService } from './shift.interface.service';
 import {
-  IShift,
+  ShiftEntity,
   IShiftPayload,
-  IShiftResponse
+  IShiftResponse,
+  AllShiftsPayload
 } from '@models/shift/shift.model';
 import { ILogger } from '@utils/log';
 import { Adapters } from '@stores/adapters';
@@ -19,24 +20,21 @@ export class ShiftService implements IShiftService {
     private readonly cache: ICache<string, IShiftResponse[]>
   ) {}
 
-  async shifts(
-    staffUUID: string,
-    month: number,
-    year: number,
-    timezone: string
-  ): Promise<IShiftResponse[]> {
-    const key = `${staffUUID.trim()}_${month}_${year}_${timezone}`;
+  async shifts(o: AllShiftsPayload): Promise<IShiftResponse[]> {
+    const key = `${o.staffUUID.trim()}_${o.month}_${o.year}_${o.timezone}`;
 
     const found = this.cache.get(key);
     if (found) return found;
 
-    const staff = await this.adapters.staffStore.staffByUUID(staffUUID.trim());
+    const staff = await this.adapters.staffStore.staffByUUID(
+      o.staffUUID.trim()
+    );
 
     if (!staff)
-      throw new NotFoundException(`no staff with id ${staffUUID.trim()}`);
+      throw new NotFoundException(`no staff with id ${o.staffUUID.trim()}`);
 
-    const first = new Date(year, month - 1, 1);
-    const last = new Date(year, month, 0);
+    const first = new Date(o.year, o.month - 1, 1);
+    const last = new Date(first.getFullYear(), first.getMonth() + 1, 0);
 
     const list = await this.adapters.shiftStore.shiftsInRange(
       staff.staff_id,
@@ -50,14 +48,8 @@ export class ShiftService implements IShiftService {
           shift_id: shift.shift_id,
           is_visible: shift.is_visible,
           is_reoccurring: shift.is_reoccurring,
-          start: moment(shift.shift_start)
-            .tz(this.logger.timezone())
-            .tz(timezone)
-            .valueOf(),
-          end: moment(shift.shift_end)
-            .tz(this.logger.timezone())
-            .tz(timezone)
-            .valueOf()
+          start: moment(shift.shift_start).tz(o.timezone).valueOf(),
+          end: moment(shift.shift_end).tz(o.timezone).valueOf()
         }) as IShiftResponse
     );
 
@@ -95,12 +87,12 @@ export class ShiftService implements IShiftService {
             shift_end: dto.times[i].end,
             is_visible: dto.times[i].isVisible,
             is_reoccurring: dto.times[i].isReoccurring
-          } as IShift);
+          } as ShiftEntity);
         }
       });
       this.cache.clear();
     } catch (e) {
-      this.logger.error(`${JSON.stringify(e)}`);
+      this.logger.error(`${e}`);
       throw new InsertionException('error saving shift');
     }
   }

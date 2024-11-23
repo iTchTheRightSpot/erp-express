@@ -9,6 +9,7 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
+  pgm.sql(``);
   pgm.createType('roleenum', ['USER', 'DEVELOPER', 'STAFF']);
 
   pgm.createTable(

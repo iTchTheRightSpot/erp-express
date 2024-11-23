@@ -1,14 +1,14 @@
-import { IStaff, StaffServiceEntity } from '@models/staff/staff.model';
+import { StaffEntity, StaffServiceEntity } from '@models/staff/staff.model';
 
 export interface IStaffStore {
-  save(s: IStaff): Promise<IStaff>;
-  staffByUUID(uuid: string): Promise<IStaff | undefined>;
+  save(s: StaffEntity): Promise<StaffEntity>;
+  staffByUUID(uuid: string): Promise<StaffEntity | undefined>;
 }
 
 export interface IStaffServiceStore {
   save(s: StaffServiceEntity): Promise<StaffServiceEntity>;
   countByStaffIdAndServiceId(
-    staffId: number,
-    serviceId: number
+    staffId: string,
+    serviceId: string
   ): Promise<number>;
 }

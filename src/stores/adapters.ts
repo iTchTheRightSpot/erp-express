@@ -13,6 +13,12 @@ import { ShiftStore } from './shift/shift.store';
 import { ServiceStore } from './service/service.store';
 import { IServiceStore } from './service/service.interface.store';
 import { StaffServiceStore } from './staff/staff-service.store';
+import {
+  IReservationStore,
+  IServiceReservationStore
+} from './reservation/reservation.interface.store';
+import { ReservationStore } from './reservation/reservation.store';
+import { ServiceReservationStore } from './reservation/service-reservation.store';
 
 /**
  * Holds all classes that directly communicate with the database.
@@ -26,6 +32,8 @@ export interface Adapters {
   shiftStore: IShiftStore;
   serviceStore: IServiceStore;
   staffServiceStore: IStaffServiceStore;
+  reservationStore: IReservationStore;
+  serviceReservationStore: IServiceReservationStore;
   txProvider?: ITransactionProvider;
 }
 
@@ -49,6 +57,8 @@ export const initializeAdapters = (
     shiftStore: new ShiftStore(logger, client),
     serviceStore: new ServiceStore(logger, client),
     staffServiceStore: new StaffServiceStore(logger, client),
+    reservationStore: new ReservationStore(logger, client),
+    serviceReservationStore: new ServiceReservationStore(logger, client),
     txProvider: tx
   };
   return store;

@@ -8,9 +8,9 @@ import {
 import { BadRequestException } from '@exceptions/bad-request.exception';
 import moment from 'moment-timezone';
 
-export interface IShift {
-  shift_id: number;
-  staff_id: number;
+export interface ShiftEntity {
+  shift_id: string;
+  staff_id: string;
   shift_start: Date;
   shift_end: Date;
   is_visible: boolean;
@@ -18,11 +18,18 @@ export interface IShift {
 }
 
 export interface IShiftResponse {
-  shift_id: number;
+  shift_id: string;
   is_visible: boolean;
   is_reoccurring: boolean;
   start: number;
   end: number;
+}
+
+export interface AllShiftsPayload {
+  staffUUID: string;
+  month: number;
+  year: number;
+  timezone: string;
 }
 
 export interface ISchedulePeriod {
@@ -77,8 +84,6 @@ export class ShiftPayload {
     };
 
     for (let i = 0; i < this.times.length; i++) {
-      let parse: moment.Moment;
-
       const m = moment(this.times[i].start, moment.ISO_8601, true);
 
       if (!m.isValid())
@@ -86,7 +91,7 @@ export class ShiftPayload {
           `${this.times[i].start} has to be in ISO format (ISO 8601)`
         );
 
-      parse = m.tz(timezone);
+      const parse = m.tz(timezone);
       if (!parse.isValid())
         throw new BadRequestException(
           `invalid date ${JSON.stringify(this.times[i].start)}`
@@ -104,6 +109,15 @@ export class ShiftPayload {
       if (result.times.some((obj) => start <= obj.end && end >= obj.start))
         throw new BadRequestException(
           `${JSON.stringify(this.times[i].start)} and duration ${JSON.stringify(this.times[i].duration)} overlap with an existing time period`
+        );
+
+      if (
+        start.getDate() !== end.getDate() ||
+        start.getMonth() !== end.getMonth() ||
+        start.getFullYear() !== end.getFullYear()
+      )
+        throw new BadRequestException(
+          `${this.times[i].start} plus duration cannot include the next day`
         );
 
       result.times[i] = {

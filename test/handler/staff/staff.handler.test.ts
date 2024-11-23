@@ -14,7 +14,8 @@ import { IJwtObject } from '@models/auth.model';
 import { IRolePermission, PermissionEnum, RoleEnum } from '@models/role.model';
 import { twoDaysInSeconds } from '@utils/util';
 import { ServiceEntity } from '@models/service/service.model';
-import { IStaff } from '@models/staff/staff.model';
+import { StaffEntity } from '@models/staff/staff.model';
+import Decimal from 'decimal.js';
 
 describe('staff handler', () => {
   let app: Application;
@@ -23,7 +24,7 @@ describe('staff handler', () => {
   let adapters: Adapters;
   const logger = new DevelopmentLogger();
   let jwtService: IJwtService;
-  let staff: IStaff;
+  let staff: StaffEntity;
   let service: ServiceEntity;
 
   beforeAll(async () => {
@@ -39,10 +40,10 @@ describe('staff handler', () => {
 
   beforeEach(async () => {
     await client.query('BEGIN');
-    staff = await adapters.staffStore.save({} as IStaff);
+    staff = await adapters.staffStore.save({} as StaffEntity);
     service = await adapters.serviceStore.save({
       name: 'service',
-      price: '63.00',
+      price: new Decimal(63.0),
       duration: 3600,
       clean_up_time: 30 * 60
     } as ServiceEntity);
