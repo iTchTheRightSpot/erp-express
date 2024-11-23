@@ -168,7 +168,7 @@ describe('reservation handler', () => {
   });
 
   describe('retrieve valid reservation times', () => {
-    it('should retrieve all available appointment for staff. 1 service as a param', async () => {
+    it('should retrieve all available reservation for staff. 1 service as a param', async () => {
       // route to test
       const res = await request(app)
         .get(
@@ -180,7 +180,7 @@ describe('reservation handler', () => {
       expect(res.status).toEqual(200);
     });
 
-    it('should retrieve all available appointment for staff. multiple services as a param', async () => {
+    it('should retrieve all available reservation for staff. multiple services as a param', async () => {
       // given
       const date = logger.date();
       date.setHours(9);
