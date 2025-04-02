@@ -4,14 +4,11 @@ A feature-rich reservation system for small businesses, like salons.
 
 ## Core Features
 
-### 1. **Monolith Application**
-   - **Frontend**: Angular served from Go binary.
-
-### 2. **Authentication & Authorization**
+### 1. **Authentication & Authorization**
    - **Login**: Email & password-based.
    - **Roles & Permissions**: Role-based access; authorized via 'GSESSION' cookie.
 
-### 3. **Staff Management**
+### 2. **Staff Management**
    - **Schedule**:
      - Only staff with `WRITE` permission can create schedules.
      - Bulk schedule creation & no conflicts.
@@ -29,7 +26,7 @@ A feature-rich reservation system for small businesses, like salons.
      - Reservation status set to `COMPLETED` only with payment info.
      - 1-day reminder notifications for pending appointments.
 
-### 4. **Client Management**
+### 3. **Client Management**
    - **Services**:
      - Clients can view all services.
      - Multiple services can be reserved.
@@ -39,7 +36,7 @@ A feature-rich reservation system for small businesses, like salons.
      - Reservations for future dates only; no rescheduling, only cancellations.
      - Clients and staff receive notifications on status changes.
 
-### 5. **Payment**
+### 4. **Payment**
    - **Invoices**: Only staff can send invoices.
    - **Online Payment**: Clients can pay via an online invoice.
 
